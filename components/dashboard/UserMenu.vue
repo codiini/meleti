@@ -3,8 +3,8 @@
     <!-- User menu -->
     <div class="flex justify-between items-center mb-8">
       <UDropdown :items="items" :popper="{ placement: 'bottom-start' }">
-        <UButton color="black" variant="outline" icon="i-heroicons-user-circle">
-          Iniubong Obonguko
+        <UButton color="black" variant="outline">
+          <UAvatar :alt="joinName" size="sm"></UAvatar>
         </UButton>
       </UDropdown>
     </div>
@@ -14,6 +14,7 @@
 <script setup lang="ts">
 const toast = useToast();
 const client = useSupabaseClient();
+const user = useSupabaseUser();
 
 const logout = async () => {
   const { error } = await client.auth.signOut();
@@ -25,12 +26,10 @@ const logout = async () => {
     });
   }
   toast.add({
-    title: "Logging you out...",
+    title: "Log out Successful!",
     icon: "i-heroicons-check-badge-solid",
   });
-  setTimeout(async () => {
-    await navigateTo("/auth/login");
-  }, 1000);
+  await navigateTo("/auth/login");
 };
 
 const items = [
@@ -70,4 +69,9 @@ const items = [
     },
   ],
 ];
+
+const joinName = computed(
+  () =>
+    `${user.value?.user_metadata.firstname} ${user.value?.user_metadata.surname}`
+);
 </script>
