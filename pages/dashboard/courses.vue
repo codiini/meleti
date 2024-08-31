@@ -2,38 +2,60 @@
   <div class="ml-64 p-8">
     <h1 class="text-3xl font-bold mb-8 text-gray-800">Course Management</h1>
 
-    <!-- Course List -->
-    <UCard v-if="courses.length > 0" class="mb-8">
-      <template #header>
-        <div class="flex justify-between items-center">
-          <h2 class="text-xl font-semibold">Your Courses</h2>
-          <UButton color="primary" @click="showAddCourseModal = true"
-            >Add New Course</UButton
-          >
-        </div>
-      </template>
-      <UTable :columns="courseColumns" :rows="courses">
-        <template #actions-data="{ row }">
-          <UButton color="primary" variant="ghost" @click="editCourse(row)"
-            >Edit</UButton
-          >
+    <template v-if="loadingStates.fetch">
+      <!-- Skeleton Loader -->
+      <UCard class="mb-8">
+        <template #header>
+          <div class="flex justify-between items-center">
+            <USkeleton class="h-6 w-32" />
+            <USkeleton class="h-10 w-36" />
+          </div>
         </template>
-      </UTable>
-    </UCard>
+        <div class="space-y-4">
+          <div v-for="i in 5" :key="i" class="flex items-center space-x-4">
+            <USkeleton class="h-6 w-1/4" />
+            <USkeleton class="h-6 w-1/3" />
+            <USkeleton class="h-6 w-1/3" />
+            <USkeleton class="h-6 w-1/3" />
+          </div>
+        </div>
+      </UCard>
+    </template>
 
-    <!-- No Courses Message -->
-    <UCard v-else class="mb-8">
-      <p class="text-center text-gray-400">
-        You haven't added any courses yet.
-      </p>
-      <UButton
-        color="primary"
-        class="mt-4 mx-auto block"
-        @click="showAddCourseModal = true"
-      >
-        Add Your First Course
-      </UButton>
-    </UCard>
+    <!-- Course List -->
+    <template v-else>
+      <UCard v-if="coursesList.length > 0" class="mb-8">
+        <template #header>
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-semibold">Your Courses</h2>
+            <UButton color="primary" @click="showAddCourseModal = true"
+              >Add New Course</UButton
+            >
+          </div>
+        </template>
+        <UTable :columns="courseColumns" :rows="coursesList">
+          <template #actions-data="{ row }">
+            <UButton color="primary" variant="ghost" @click="editCourse(row)"
+              >Edit</UButton
+            >
+          </template>
+        </UTable>
+      </UCard>
+
+      <!-- No Courses Message -->
+      <UCard v-else class="mb-8">
+        <p class="text-center text-gray-400">
+          You haven't added any courses yet.
+        </p>
+        <UButton
+          color="primary"
+          class="mt-4 mx-auto block"
+          @click="showAddCourseModal = true"
+        >
+          Add Your First Course
+        </UButton>
+      </UCard>
+    </template>
 
     <!-- Add/Edit Course Modal -->
     <UModal v-model="showAddCourseModal" prevent-close>
@@ -85,7 +107,7 @@
           <UButton
             v-if="editingCourse"
             :loading="loadingStates.delete"
-            @click="deleteCourse"
+            @click="handleDelete"
             color="red"
             block
             >Delete Course
@@ -100,12 +122,6 @@
 const supabase = useSupabaseClient();
 const toast = useToast();
 
-const courses = ref([]);
-const loadingStates = reactive({
-  save: false,
-  delete: false,
-});
-const isLoading = ref(false);
 const showAddCourseModal = ref(false);
 const editingCourse = ref(null);
 const courseForm = ref({
@@ -113,6 +129,15 @@ const courseForm = ref({
   description: "",
   materials: [],
 });
+
+const {
+  coursesList,
+  fetchCourses,
+  deleteCourse,
+  updateCourse,
+  createCourse,
+  loadingStates,
+} = useCourses(courseForm);
 
 const courseColumns = [
   { key: "title", label: "Course Title" },
@@ -133,121 +158,28 @@ const closeModal = () => {
   courseForm.value = { name: "", description: "", materials: [] };
 };
 
-const updateCourse = async () => {
-  try {
-    loadingStates.save = true;
-    const { data, error } = await supabase
-      .from("courses")
-      .update({
-        title: courseForm.value.title,
-        description: courseForm.value.description,
-      })
-      .eq("id", courseForm.value.id)
-      .select();
-    loadingStates.save = false;
-    if (error) {
-      return toast.add({
-        title: "Error Updating Course",
-        description:
-          "There was an error updating the selected course. Please try again later.",
-        icon: "i-heroicons-exclamation-circle",
-      });
-    }
-  } catch (error) {}
-};
-
 const saveCourse = async () => {
-  try {
-    if (editingCourse.value) {
-      if (!courseForm.value.title || !courseForm.value.description) {
-        return toast.add({
-          title: "Incomplete fields",
-          description: "Please fill in all the required fields and try again",
-          icon: "i-heroicons-exclamation-circle",
-        });
-      }
-      // Update existing course
-      await updateCourse();
-    } else {
-      if (!courseForm.value.title || !courseForm.value.description) {
-        return toast.add({
-          title: "Incomplete fields",
-          description: "Please fill in all the required fields and try again",
-          icon: "i-heroicons-exclamation-circle",
-        });
-      }
-      // Add new course
-      loadingStates.save = true;
-      const { data, error } = await supabase
-        .from("courses")
-        .insert([
-          {
-            title: courseForm.value.title,
-            description: courseForm.value.description,
-            user_id: "e5bc4f52-7d84-4df5-b143-5f914fbeea4b",
-          },
-        ])
-        .select();
-      loadingStates.save = false;
-      if (error) {
-        return toast.add({
-          title: "Error While Adding Course",
-          description:
-            "There was an error while adding the course. Please try again later.",
-          icon: "i-heroicons-exclamation-circle",
-        });
-      }
-
-      toast.add({
-        title: "Course Added Successfully!",
-        icon: "i-heroicons-check-badge-solid",
-      });
-    }
-    fetchCourses();
-    closeModal();
-  } catch (error) {}
-};
-
-const fetchCourses = async () => {
-  try {
-    let { data, error } = await supabase.from("courses").select("*");
-    courses.value = data;
-    if (error) {
-      return toast.add({
-        title: "Error Fetching Courses",
-        description:
-          "There was an error fetching your courses. Please try again later.",
-        icon: "i-heroicons-exclamation-circle",
-      });
-    }
-  } catch (error) {}
-};
-
-const deleteCourse = async () => {
-  try {
-    loadingStates.delete = true;
-    const { error } = await supabase
-      .from("courses")
-      .delete()
-      .eq("id", courseForm.value.id);
-
-    loadingStates.delete = false;
-    if (error) {
-      return toast.add({
-        title: "Error Deleting Course",
-        description:
-          "There was an error deleting the selected course. Please try again later.",
-        icon: "i-heroicons-exclamation-circle",
-      });
-    }
-    closeModal();
-    fetchCourses();
-    toast.add({
-      title: "Course Deleted Successfully!",
-      icon: "i-heroicons-check-badge-solid",
+  if (!courseForm.value.title || !courseForm.value.description) {
+    return toast.add({
+      title: "Incomplete fields",
+      description: "Please fill in all the required fields and try again",
+      icon: "i-heroicons-exclamation-circle",
     });
-  } catch (error) {}
+  }
+
+  if (editingCourse.value) {
+    await updateCourse();
+  } else {
+    await createCourse();
+  }
+  fetchCourses();
+  closeModal();
 };
 
-fetchCourses();
+const handleDelete = async () => {
+  await deleteCourse();
+  closeModal();
+};
+
+onMounted(() => fetchCourses());
 </script>
