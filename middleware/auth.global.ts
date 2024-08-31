@@ -8,7 +8,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     "/auth/new-password",
   ];
 
-  if (to.path === "/auth/new-password" && to.query.token) {
+  if (to.path === "/auth/new-password" && to.query.code) {
     return;
   }
 
