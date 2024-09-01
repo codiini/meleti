@@ -12,7 +12,6 @@
   "devDependencies": {
     "@nuxt/devtools": "latest",
     "@nuxt/ui": "^2.18.4",
-    "@nuxthub/core": "^0.7.7",
     "@nuxtjs/supabase": "^1.4.0",
     "nuxt": "^3.12.4",
     "wrangler": "^3.73.0",
