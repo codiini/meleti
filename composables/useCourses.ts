@@ -6,6 +6,7 @@ export const useCourses = (courseForm: Ref<Course>) => {
   const toast = useToast();
 
   const coursesList = ref<Course[]>([]);
+
   const loadingStates = reactive({
     save: false,
     delete: false,
@@ -106,6 +107,27 @@ export const useCourses = (courseForm: Ref<Course>) => {
     });
   };
 
+  const getCourseFileDetails = async (id: string) => {
+    const { data, error } = await supabase
+      .from("course_files")
+      .select(`id, unique_file_name, file_name`)
+      .match({
+        course_id: id ?? coursesList.value[0]?.id,
+      });
+
+    if (error) {
+      return toast.add({
+        title: "Error Fetching Course Files",
+        description:
+          "There was an error fetching your course files. Please try again later.",
+        icon: "i-heroicons-exclamation-circle",
+        color: "red",
+      });
+    }
+
+    return data;
+  };
+
   return {
     fetchCourses,
     deleteCourse,
@@ -113,5 +135,6 @@ export const useCourses = (courseForm: Ref<Course>) => {
     loadingStates,
     updateCourse,
     createCourse,
+    getCourseFileDetails,
   };
 };

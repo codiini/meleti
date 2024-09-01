@@ -89,6 +89,7 @@
           </UFormGroup>
           <UFormGroup label="Course Materials" name="courseMaterials">
             <UInput
+              @change="handleFileUpload($event)"
               type="file"
               v-model="courseForm.materials"
               accept=".pdf,.doc,.docx,.txt"
@@ -99,11 +100,12 @@
           </UFormGroup>
           <UButton
             type="submit"
-            :loading="loadingStates.save"
+            :loading="loadingStates.save || isFileUploading"
             color="primary"
             block
-            >Save Course</UButton
           >
+            {{ isFileUploading ? `Uploading...` : `Save Course` }}
+          </UButton>
           <UButton
             v-if="editingCourse"
             :loading="loadingStates.delete"
@@ -118,17 +120,20 @@
   </div>
 </template>
 
-<script setup>
-const supabase = useSupabaseClient();
+<script setup lang="ts">
+import type { Course } from "@/types/courses";
+
 const toast = useToast();
+const supabase = useSupabaseClient();
 
 const showAddCourseModal = ref(false);
 const editingCourse = ref(null);
 const courseForm = ref({
   title: "",
   description: "",
-  materials: [],
+  materials: "",
 });
+const isFileUploading = ref(false);
 
 const {
   coursesList,
@@ -146,7 +151,7 @@ const courseColumns = [
   { key: "actions", label: "Actions" },
 ];
 
-const editCourse = (course) => {
+const editCourse = (course: Course) => {
   editingCourse.value = course;
   courseForm.value = { ...course };
   showAddCourseModal.value = true;
@@ -181,5 +186,62 @@ const handleDelete = async () => {
   closeModal();
 };
 
-onMounted(() => fetchCourses());
+const handleFileUpload = async (file: (string | Blob)[]) => {
+  isFileUploading.value = true;
+  try {
+    // Get pre-signed URL
+    const data = await $fetch("/api/files/upload", {
+      method: "PUT",
+      body: {
+        fileName: file[0].name,
+        fileType: file[0].type,
+      },
+    });
+
+    const { signedUrl, fileUrl, fileName, uniqueFileName, fileType } = data;
+
+    console.log("presignedURL:", data);
+
+    await $fetch(signedUrl, {
+      method: "PUT",
+      body: file[0],
+      headers: {
+        "Content-Type": file[0].type,
+      },
+    });
+
+    courseForm.value.materialUrl = fileUrl;
+
+    const { data: materialData, error } = await supabase
+      .from("course_files")
+      .insert([
+        {
+          course_id: courseForm.value.id,
+          file_name: fileName,
+          unique_file_name: uniqueFileName,
+          file_url: fileUrl,
+          file_type: fileType,
+        },
+      ])
+      .select();
+
+    console.log(materialData);
+
+    toast.add({
+      title: "File Uploaded",
+      description: "Your file has been uploaded successfully.",
+      icon: "i-heroicons-check-circle",
+    });
+  } catch (error) {
+    toast.add({
+      title: "Upload Failed",
+      description: "There was an error uploading your file. Please try again.",
+      icon: "i-heroicons-exclamation-circle",
+    });
+  } finally {
+    isFileUploading.value = false;
+  }
+};
+
+onMounted(async () => await fetchCourses());
 </script>
