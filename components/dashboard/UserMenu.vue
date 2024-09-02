@@ -43,25 +43,14 @@ const items = [
   ],
   [
     {
-      label: "Edit",
+      label: "Settings",
       icon: "i-heroicons-pencil-square-20-solid",
-      shortcuts: ["E"],
       click: () => {
-        console.log("Edit");
+        navigateTo("/profile/settings");
       },
-    },
-    {
-      label: "Duplicate",
-      icon: "i-heroicons-document-duplicate-20-solid",
-      shortcuts: ["D"],
-      disabled: true,
     },
   ],
   [
-    {
-      label: "Archive",
-      icon: "i-heroicons-archive-box-20-solid",
-    },
     {
       label: "Logout",
       icon: "i-heroicons-arrow-right-circle-20-solid",
