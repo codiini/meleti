@@ -58,8 +58,9 @@
     </template>
 
     <!-- Add/Edit Course Modal -->
+    <!-- TODO: Refactor this to a separate component -->
     <UModal v-model="showAddCourseModal" prevent-close>
-      <UCard>
+      <UCard v-if="showAddCourseModal">
         <template #header>
           <div class="flex items-center justify-between">
             <h3 class="text-lg font-semibold">
@@ -87,15 +88,71 @@
               placeholder="Enter course description"
             />
           </UFormGroup>
-          <UFormGroup label="Course Materials" name="courseMaterials">
+          <UFormGroup
+            v-if="editingCourse"
+            label="Course Materials"
+            name="courseMaterials"
+          >
+            <template v-if="courseForm.materials?.length == 0">
+              <p class="text-gray-400">No study materials uploaded yet.</p>
+            </template>
+            <template v-else>
+              <ul class="flex flex-col space-y-2 mb-4">
+                <li
+                  v-for="{
+                    id,
+                    unique_file_name,
+                    deleting,
+                    file_name,
+                  } in courseForm.materials"
+                  :key="id"
+                  class="flex items-center gap-x-2"
+                >
+                  <UBadge
+                    color="green"
+                    variant="solid"
+                    class="flex items-center space-x-2"
+                    >{{ file_name }}</UBadge
+                  >
+                  <UButton
+                    :disabled="deleting"
+                    color="red"
+                    variant="ghost"
+                    @click="removeMaterial(id, unique_file_name)"
+                  >
+                    <UIcon
+                      v-if="deleting"
+                      name="i-heroicons-arrow-path"
+                      class="w-5 h-5 animate-spin"
+                    />
+                    <UIcon
+                      v-else
+                      name="i-heroicons-trash-solid"
+                      class="w-5 h-5"
+                    />
+                  </UButton>
+                </li>
+              </ul>
+            </template>
+          </UFormGroup>
+          <UFormGroup label="Upload Study Materials" name="courseMaterials">
+            <template #help>
+              <p
+                v-if="courseForm.materials?.length == 2"
+                class="flex items-center gap-x-1"
+              >
+                <UIcon name="i-heroicons-exclamation-circle" class="w-5 h-5" />
+                You can only add 2 materials to a course.
+              </p>
+            </template>
             <UInput
+              :disabled="isFileUploading || courseForm.materials?.length == 2"
               @change="handleFileUpload($event)"
               type="file"
-              v-model="courseForm.materials"
-              accept=".pdf,.doc,.docx,.txt"
-              multiple
+              accept=".pdf"
               icon="i-heroicons-folder"
-              placeholder="Upload course materials"
+              placeholder="Upload study materials"
+              class="cursor-pointer"
             />
           </UFormGroup>
           <UButton
@@ -121,17 +178,16 @@
 </template>
 
 <script setup lang="ts">
-import type { Course } from "@/types/courses";
-
+import type { Course, CourseFile } from "@/types/courses";
 const toast = useToast();
-const supabase = useSupabaseClient();
 
 const showAddCourseModal = ref(false);
-const editingCourse = ref(null);
-const courseForm = ref({
+const editingCourse = ref(false);
+const courseForm = ref<Partial<Course>>({
+  id: "",
   title: "",
   description: "",
-  materials: "",
+  materials: [],
 });
 const isFileUploading = ref(false);
 
@@ -142,25 +198,41 @@ const {
   updateCourse,
   createCourse,
   loadingStates,
-} = useCourses(courseForm);
+  getCourseFileDetails,
+  deleteCourseFile,
+} = useCourses(courseForm as Ref<Course>);
 
 const courseColumns = [
   { key: "title", label: "Course Title" },
   { key: "description", label: "Description" },
-  { key: "materialCount", label: "Materials" },
   { key: "actions", label: "Actions" },
 ];
 
-const editCourse = (course: Course) => {
-  editingCourse.value = course;
-  courseForm.value = { ...course };
+const editCourse = async (course: Course) => {
+  editingCourse.value = true;
+  courseForm.value = course;
+  await fetchCourseFiles(course.id);
   showAddCourseModal.value = true;
 };
 
+const removeMaterial = async (id: string, unique_file_name: string) => {
+  courseForm.value.materials = courseForm.value?.materials?.map(
+    (material: CourseFile) =>
+      material.id === id ? { ...material, deleting: true } : material
+  );
+  await deleteCourseFile(unique_file_name);
+  await fetchCourseFiles(courseForm.value.id as string);
+};
+
 const closeModal = () => {
+  editingCourse.value = false;
   showAddCourseModal.value = false;
-  editingCourse.value = null;
-  courseForm.value = { name: "", description: "", materials: [] };
+  courseForm.value = {
+    id: "",
+    title: "",
+    description: "",
+    materials: [],
+  };
 };
 
 const saveCourse = async () => {
@@ -188,51 +260,28 @@ const handleDelete = async () => {
 
 const handleFileUpload = async (file: (string | Blob)[]) => {
   isFileUploading.value = true;
+
+  const formData = new FormData();
+  formData.append("file", file[0]);
+
   try {
-    // Get pre-signed URL
-    const data = await $fetch("/api/files/upload", {
-      method: "PUT",
-      body: {
-        fileName: file[0].name,
-        fileType: file[0].type,
+    const { error } = await $fetch("/api/files/upload", {
+      method: "POST",
+      body: formData,
+      params: {
+        courseId: courseForm.value.id,
       },
     });
 
-    const { signedUrl, fileUrl, fileName, uniqueFileName, fileType } = data;
-
-    console.log("presignedURL:", data);
-
-    await $fetch(signedUrl, {
-      method: "PUT",
-      body: file[0],
-      headers: {
-        "Content-Type": file[0].type,
-      },
-    });
-
-    courseForm.value.materialUrl = fileUrl;
-
-    const { data: materialData, error } = await supabase
-      .from("course_files")
-      .insert([
-        {
-          course_id: courseForm.value.id,
-          file_name: fileName,
-          unique_file_name: uniqueFileName,
-          file_url: fileUrl,
-          file_type: fileType,
-        },
-      ])
-      .select();
-
-    console.log(materialData);
-
-    toast.add({
-      title: "File Uploaded",
-      description: "Your file has been uploaded successfully.",
-      icon: "i-heroicons-check-circle",
-    });
-  } catch (error) {
+    if (!error) {
+      await fetchCourseFiles(courseForm.value.id as string);
+      toast.add({
+        title: "File Uploaded",
+        description: "Your file has been uploaded successfully.",
+        icon: "i-heroicons-check-circle",
+      });
+    }
+  } catch (e) {
     toast.add({
       title: "Upload Failed",
       description: "There was an error uploading your file. Please try again.",
@@ -243,5 +292,15 @@ const handleFileUpload = async (file: (string | Blob)[]) => {
   }
 };
 
-onMounted(async () => await fetchCourses());
+const fetchCourseFiles = async (id: string) => {
+  const courseFiles = await getCourseFileDetails(id);
+  courseForm.value.materials = courseFiles?.map((file) => ({
+    ...file,
+    deleting: false,
+  }));
+};
+
+onMounted(async () => {
+  await fetchCourses();
+});
 </script>
