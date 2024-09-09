@@ -64,7 +64,7 @@ async function convertPdfToText(
   pages: string,
   destinationFile: string
 ): Promise<void> {
-  const queryPath = `/v1/pdf/convert/to/text-simple`;
+  const queryPath = `/v1/pdf/convert/to/text`;
 
   const jsonPayload = JSON.stringify({
     name: path.basename(destinationFile),
@@ -228,13 +228,20 @@ export default defineEventHandler(async (event) => {
       fileType,
     } = uploadData;
 
-    await $fetch(signedUrl, {
-      method: "PUT",
-      body: textContent,
-      headers: {
-        "Content-Type": "text/plain",
-      },
-    });
+    try {
+      await $fetch(signedUrl, {
+        method: "PUT",
+        body: textContent,
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      });
+    } catch (error) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Failed to upload text content. Please try again later.",
+      });
+    }
 
     // 4. UPLOAD THE TEXT CONTENT TO SUPABASE
     const { data: materialData, error } = await client
@@ -251,13 +258,15 @@ export default defineEventHandler(async (event) => {
       .select();
 
     return {
+      statusCode: 200,
       data: materialData[0],
       error: error,
     };
   } catch (e) {
-    return {
-      error: true,
-      message: e,
-    };
+    throw createError({
+      statusCode: 500,
+      statusMessage:
+        "An error occured during file upload. Please try again later.",
+    });
   }
 });

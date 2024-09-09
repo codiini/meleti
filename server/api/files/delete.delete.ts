@@ -23,15 +23,21 @@ export default defineEventHandler(async (event) => {
     });
 
     try {
+      const response = await s3Client.send(command);
       await supabaseClient
         .from("course_files")
         .delete()
         .eq("unique_file_name", fileId);
-      const response = await s3Client.send(command);
-      return response;
+      return {
+        statusCode: 200,
+        body: response,
+      };
     } catch (error) {
-      console.error("Error deleting object:", error);
-      return error;
+      throw createError({
+        statusCode: 500,
+        statusMessage:
+          "An error occured during file deletion. Please try again later.",
+      });
     }
   };
 
