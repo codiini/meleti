@@ -257,10 +257,17 @@ export default defineEventHandler(async (event) => {
       ])
       .select();
 
+    if (error) {
+      throw createError({
+        statusCode: 500,
+        statusMessage:
+          "An error occured during file upload. Please try again later.",
+      });
+    }
+
     return {
       statusCode: 200,
       data: materialData[0],
-      error: error,
     };
   } catch (e) {
     throw createError({

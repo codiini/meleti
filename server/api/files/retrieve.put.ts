@@ -4,8 +4,6 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const { fileName } = body;
-  console.log("Event: ", event);
-  console.log("Body: ", body);
 
   const s3Client = new S3({
     region: "auto",
