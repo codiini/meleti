@@ -26,7 +26,7 @@
           <h2 class="text-lg font-semibold">Create New Test</h2>
         </template>
         <UButton
-          to="/dashboard/tests"
+          to="/dashboard/tests/new"
           icon="i-heroicons-clock-solid"
           label="New Test"
           color="primary"

@@ -105,7 +105,6 @@ const handleSubmit = async () => {
       description:
         "Your password has been successfully reset. You can now log in with your new password.",
       icon: "i-heroicons-check-circle",
-      color: "green",
       callback: () => navigateTo("/auth/login"),
     });
   } catch (error) {
