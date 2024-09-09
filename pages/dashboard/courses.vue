@@ -118,7 +118,7 @@
                     :disabled="deleting"
                     color="red"
                     variant="ghost"
-                    @click="removeMaterial(id, unique_file_name)"
+                    @click="deleteMaterial(id, unique_file_name)"
                   >
                     <UIcon
                       v-if="deleting"
@@ -183,7 +183,7 @@ const toast = useToast();
 
 const showAddCourseModal = ref(false);
 const editingCourse = ref(false);
-const courseForm = ref<Partial<Course>>({
+const courseForm = reactive<Course>({
   id: "",
   title: "",
   description: "",
@@ -200,7 +200,7 @@ const {
   loadingStates,
   getCourseFileDetails,
   deleteCourseFile,
-} = useCourses(courseForm as Ref<Course>);
+} = useCourses();
 
 const courseColumns = [
   { key: "title", label: "Course Title" },
@@ -210,33 +210,39 @@ const courseColumns = [
 
 const editCourse = async (course: Course) => {
   editingCourse.value = true;
-  courseForm.value = course;
+  Object.assign(courseForm, course);
   await fetchCourseFiles(course.id);
   showAddCourseModal.value = true;
 };
 
-const removeMaterial = async (id: string, unique_file_name: string) => {
-  courseForm.value.materials = courseForm.value?.materials?.map(
-    (material: CourseFile) =>
-      material.id === id ? { ...material, deleting: true } : material
+const deleteMaterial = async (id: string, unique_file_name: string) => {
+  courseForm.materials = courseForm?.materials?.map((material: CourseFile) =>
+    material.id === id ? { ...material, deleting: true } : material
   );
-  await deleteCourseFile(unique_file_name);
-  await fetchCourseFiles(courseForm.value.id as string);
+  try {
+    await deleteCourseFile(unique_file_name);
+  } finally {
+    courseForm.materials = courseForm?.materials?.map((material: CourseFile) =>
+      material.id === id ? { ...material, deleting: false } : material
+    );
+  }
+
+  await fetchCourseFiles(courseForm.id);
 };
 
 const closeModal = () => {
   editingCourse.value = false;
   showAddCourseModal.value = false;
-  courseForm.value = {
+  Object.assign(courseForm, {
     id: "",
     title: "",
     description: "",
     materials: [],
-  };
+  });
 };
 
 const saveCourse = async () => {
-  if (!courseForm.value.title || !courseForm.value.description) {
+  if (!courseForm.title || !courseForm.description) {
     return toast.add({
       title: "Incomplete fields",
       description: "Please fill in all the required fields and try again",
@@ -245,16 +251,16 @@ const saveCourse = async () => {
   }
 
   if (editingCourse.value) {
-    await updateCourse();
+    await updateCourse(courseForm.id, courseForm.title, courseForm.description);
   } else {
-    await createCourse();
+    await createCourse(courseForm.title, courseForm.description);
   }
   fetchCourses();
   closeModal();
 };
 
 const handleDelete = async () => {
-  await deleteCourse();
+  await deleteCourse(courseForm.id);
   closeModal();
 };
 
@@ -265,16 +271,19 @@ const handleFileUpload = async (file: (string | Blob)[]) => {
   formData.append("file", file[0]);
 
   try {
-    const { error } = await $fetch("/api/files/upload", {
-      method: "POST",
-      body: formData,
-      params: {
-        courseId: courseForm.value.id,
-      },
-    });
+    const { statusCode }: { statusCode: number } = await $fetch(
+      "/api/files/upload",
+      {
+        method: "POST",
+        body: formData,
+        params: {
+          courseId: courseForm.id,
+        },
+      }
+    );
 
-    if (!error) {
-      await fetchCourseFiles(courseForm.value.id as string);
+    if (statusCode == 200) {
+      await fetchCourseFiles(courseForm.id);
       toast.add({
         title: "File Uploaded",
         description: "Your file has been uploaded successfully.",
@@ -294,10 +303,11 @@ const handleFileUpload = async (file: (string | Blob)[]) => {
 
 const fetchCourseFiles = async (id: string) => {
   const courseFiles = await getCourseFileDetails(id);
-  courseForm.value.materials = courseFiles?.map((file) => ({
-    ...file,
-    deleting: false,
-  }));
+  courseForm.materials =
+    courseFiles?.map((file: CourseFile) => ({
+      ...file,
+      deleting: false,
+    })) || [];
 };
 
 onMounted(async () => {

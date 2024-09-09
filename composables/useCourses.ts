@@ -1,6 +1,6 @@
-import type { Course } from "~/types/courses";
+import type { CourseFile, Course } from "~/types/courses";
 
-export const useCourses = (courseForm: Ref<Course>) => {
+export const useCourses = () => {
   const supabase = useSupabaseClient();
   const user = useSupabaseUser();
   const toast = useToast();
@@ -29,12 +29,9 @@ export const useCourses = (courseForm: Ref<Course>) => {
     }
   };
 
-  const deleteCourse = async () => {
+  const deleteCourse = async (id: string) => {
     loadingStates.delete = true;
-    const { error } = await supabase
-      .from("courses")
-      .delete()
-      .eq("id", courseForm.value.id);
+    const { error } = await supabase.from("courses").delete().eq("id", id);
 
     loadingStates.delete = false;
     if (error) {
@@ -53,15 +50,19 @@ export const useCourses = (courseForm: Ref<Course>) => {
     });
   };
 
-  const updateCourse = async () => {
+  const updateCourse = async (
+    id: string,
+    title: string,
+    description: string
+  ) => {
     loadingStates.save = true;
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("courses")
       .update({
-        title: courseForm.value.title,
-        description: courseForm.value.description,
+        title: title,
+        description: description,
       })
-      .eq("id", courseForm.value.id)
+      .eq("id", id)
       .select();
     loadingStates.save = false;
     if (error) {
@@ -79,27 +80,28 @@ export const useCourses = (courseForm: Ref<Course>) => {
     });
   };
 
-  const createCourse = async () => {
+  const createCourse = async (title: string, description: string) => {
     loadingStates.save = true;
     const { data, error } = await supabase
       .from("courses")
       .insert([
         {
-          title: courseForm.value.title,
-          description: courseForm.value.description,
+          title: title,
+          description: description,
           user_id: user.value?.id,
         },
       ])
       .select();
     loadingStates.save = false;
     if (error) {
-      return toast.add({
+      toast.add({
         title: "Error While Adding Course",
         description:
           "There was an error while adding the course. Please try again later.",
         icon: "i-heroicons-exclamation-circle",
         color: "red",
       });
+      return;
     }
     toast.add({
       title: "Course Added Successfully!",
@@ -116,18 +118,42 @@ export const useCourses = (courseForm: Ref<Course>) => {
       });
 
     if (error) {
-      return toast.add({
-        title: "Error Fetching Course Files",
+      toast.add({
+        title: "Error Fetching Study Materials",
         description:
-          "There was an error fetching your course files. Please try again later.",
+          "There was an error fetching your study materials. Please try again later.",
         icon: "i-heroicons-exclamation-circle",
         color: "red",
       });
+      return;
     }
 
     return data;
   };
 
+  const deleteCourseFile = async (id: string) => {
+    try {
+      await $fetch("/api/files/delete", {
+        method: "DELETE",
+        params: {
+          id: "122334343",
+        },
+      });
+
+      toast.add({
+        title: "Study Material Deleted Successfully!",
+        icon: "i-heroicons-check-badge-solid",
+      });
+    } catch (e: any) {
+      console.error(e);
+      toast.add({
+        title: "Error Deleting Study Material",
+        description: e.statusMessage,
+        icon: "i-heroicons-exclamation-circle",
+        color: "red",
+      });
+    }
+  };
   return {
     fetchCourses,
     deleteCourse,
@@ -136,5 +162,6 @@ export const useCourses = (courseForm: Ref<Course>) => {
     updateCourse,
     createCourse,
     getCourseFileDetails,
+    deleteCourseFile,
   };
 };
