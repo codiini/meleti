@@ -1,6 +1,6 @@
 <template>
   <div class="ml-64 p-8">
-    <h1 class="text-3xl font-bold mb-8 text-gray-800">Create New Test</h1>
+    <h2 class="text-3xl font-bold mb-8 text-gray-800">Create New Test</h2>
 
     <UCard class="mb-8 pb-40">
       <template #header>
@@ -28,10 +28,10 @@
           </UFormGroup>
 
           <!-- Question Type -->
-          <UFormGroup label="Question type" name="questionType">
+          <UFormGroup label="Test Type" name="testType">
             <USelect
-              v-model="formState.questionType"
-              :options="questionTypeOptions"
+              v-model="formState.testType"
+              :options="testTypeOptions"
               placeholder="Select question type"
               class="bg-gray-800 text-white"
             />
@@ -82,8 +82,8 @@
               class="space-y-2"
             >
               <URadioGroup
-                v-model="formState.selectedFiles"
-                value-attribute="id"
+                v-model="formState.selectedFile"
+                value-attribute="unique_file_name"
                 option-attribute="file_name"
                 :options="formState.courseFiles"
               />
@@ -103,11 +103,29 @@
         </div>
 
         <UButton
+          :loading="loadingStates.testCreation"
           type="submit"
           color="primary"
+          size="xl"
+          class="w-full h-16 text-center flex items-center justify-center"
           :disabled="!formState.selectedCourse"
         >
-          Create Test
+          Generate Test
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            fill="#000000"
+            height="20px"
+            width="20px"
+            version="1.1"
+            id="Capa_1"
+            viewBox="0 0 489.059 489.059"
+            xml:space="preserve"
+          >
+            <path
+              d="M481.211,443.368L224.809,186.946l55.817-17.364c3.88-1.196,6.736-4.509,7.38-8.528c0.642-4.018-1.058-8.051-4.383-10.385  l-56.798-40.165c-9.814-6.913-15.56-18.2-15.417-30.172l0.916-69.519c0.051-4.06-2.23-7.796-5.837-9.647  c-3.608-1.844-7.976-1.483-11.225,0.962l-55.73,41.584c-9.588,7.163-22.117,9.136-33.439,5.294L40.246,26.678  c-3.848-1.315-8.118-0.322-11.007,2.55c-2.868,2.872-3.847,7.138-2.563,10.987l22.376,65.862c3.8,11.343,1.828,23.837-5.325,33.438  L2.131,195.245c-2.418,3.272-2.819,7.628-0.977,11.236c1.859,3.633,5.599,5.887,9.688,5.84l69.502-0.898  c11.971-0.153,23.244,5.582,30.174,15.366l40.149,56.807c2.373,3.32,6.401,5.021,10.412,4.387c4.025-0.632,7.314-3.497,8.518-7.378  l17.375-55.805l256.389,256.422c5.243,5.221,12.094,7.836,18.908,7.836c6.885,0,13.73-2.615,18.943-7.836  C491.671,470.772,491.671,453.826,481.211,443.368z"
+            />
+          </svg>
         </UButton>
       </form>
     </UCard>
@@ -116,20 +134,22 @@
 
 <script setup lang="ts">
 const { fetchCourses, coursesList } = useCourses();
-// const toast = useToast();
+const toast = useToast();
 const supabase = useSupabaseClient();
+const user = useSupabaseUser();
 
-// const questions = ref(null);
+const generatedQuestions = ref([]);
 
 const formState = reactive({
   title: "",
   difficulty: "medium",
   maxQuestions: 20,
-  questionType: "multiple_choice",
+  testType: "multiple_choice",
   courseFiles: [],
   selectedCourse: "",
-  selectedFiles: [],
+  selectedFile: "",
   duration: 1800,
+  description: "",
 });
 
 const loadingStates = reactive({
@@ -138,7 +158,7 @@ const loadingStates = reactive({
   testCreation: false,
 });
 
-const questionTypeOptions = [
+const testTypeOptions = [
   {
     label: "Multiple Choice",
     value: "multiple_choice",
@@ -173,7 +193,43 @@ const difficultyOptions = [
 const handleTestCreation = async () => {
   loadingStates.testCreation = true;
 
-  
+  try {
+    const { data } = await $fetch("/api/tests/generate", {
+      method: "POST",
+      body: {
+        fileId: formState.selectedFile,
+        maxQuestions: formState.maxQuestions,
+        difficulty: formState.difficulty,
+        courseId: formState.selectedCourse,
+        title: formState.title,
+        testType: formState.testType,
+        duration: formState.duration,
+        description: formState.description,
+        userId: user.value?.id,
+      },
+    });
+
+    generatedQuestions.value = data.questions;
+
+    toast.add({
+      title: "Test created successfully",
+      description: "Test created successfully, taking you to the test page...",
+      color: "green",
+      callback: () => {
+        navigateTo(`/dashboard/tests/play/${data.id}`);
+      },
+    });
+  } catch (error) {
+    console.error("Error generating test:", error);
+    toast.add({
+      title: "Error",
+      description: "Error while generating test",
+      color: "red",
+    });
+  } finally {
+    loadingStates.testCreation = false;
+  }
+
   // const { data, error } = await supabase
   //   .from("tests")
   //   .insert([
@@ -207,22 +263,6 @@ const fetchCourseFiles = async () => {
   }
   loadingStates.courseFileDetails = false;
 };
-
-// const sendToServer = async (base64Data: string | []) => {
-//   const response = await $fetch("/api/ai/gemini", {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     body: {
-//       documents: base64Data,
-//       questionType: questionType.value,
-//       maxQuestions: maxQuestions.value,
-//     },
-//   });
-
-//   return response.aggregatedResponse.candidates[0].content.parts[0].text;
-// };
 
 onMounted(async () => {
   await fetchCourses();

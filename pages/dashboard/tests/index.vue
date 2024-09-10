@@ -4,20 +4,17 @@
       <h2 class="text-3xl font-bold text-gray-800">My Tests</h2>
     </div>
 
+    <div class="flex justify-end pt-2 pb-4">
+      <UButton
+        size="xl"
+        to="/dashboard/tests/new"
+        icon="i-heroicons-plus"
+        label="Create New Test"
+        class="flex items-center justify-center h-12"
+      />
+    </div>
     <!-- Test List -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <UCard class="bg-white dark:bg-white text-gray-900">
-        <template #header>
-          <h2 class="text-lg font-semibold">Create New Test</h2>
-        </template>
-        <UButton
-          to="/dashboard/tests/new"
-          icon="i-heroicons-plus"
-          label="Create New Test"
-          class="w-full flex items-center justify-center h-20"
-        />
-      </UCard>
-
       <!-- Loading Skeleton -->
       <template v-if="loading">
         <div v-for="n in 3" :key="n" class="animate-pulse">
@@ -37,6 +34,7 @@
       </template>
 
       <!-- Test Cards -->
+
       <template v-else>
         <UCard
           v-for="test in tests"
@@ -50,20 +48,32 @@
               <span>{{ test.questions.length }} questions</span>
             </div>
           </template>
-          <p>{{ test?.description }}</p>
+          <div class="h-20">
+            <h3 class="text-lg font-semibold">{{ test.title }}</h3>
+            <p>{{ test?.description }}</p>
+          </div>
           <template #footer>
-            <UButton label="Edit" variant="ghost" />
-            <UButton
-              :to="`/dashboard/tests/play/${test.id}`"
-              label="Start"
-              color="primary"
-            />
+            <div class="flex gap-x-2">
+              <UButton
+                disabled
+                label="Edit"
+                variant="outline"
+                class="w-20 flex justify-center"
+              />
+              <UButton
+                :to="`/dashboard/tests/play/${test.id}`"
+                label="Start"
+                color="primary"
+                class="w-20 flex justify-center"
+              />
+            </div>
           </template>
         </UCard>
       </template>
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 const supabase = useSupabaseClient();
 
