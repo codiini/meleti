@@ -4,7 +4,7 @@ import { randomUUID } from "crypto";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const { fileName, fileType } = body;
+  const { fileName, fileType }: { fileName: string; fileType: string } = body;
 
   const uniqueFileName = `${randomUUID()}-${fileName}`;
 

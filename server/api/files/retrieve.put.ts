@@ -32,7 +32,10 @@ export default defineEventHandler(async (event) => {
       expiresIn: 3600,
     });
 
-    return signedUrl;
+    return {
+      statusCode: 200,
+      data: signedUrl,
+    };
   } catch (error) {
     console.error("Error generating signed URL:", error);
     throw createError({

@@ -5,6 +5,11 @@ import { serverSupabaseClient } from "#supabase/server";
 
 const API_KEY = process.env.PDF_CO_API_KEY as string;
 
+type ConvertPdfToTextResponse = {
+  url: string;
+  status: "success" | "working" | "error";
+};
+
 async function getPresignedUrl(fileName: string): Promise<[string, string]> {
   try {
     const queryPath = `/v1/file/upload/get-presigned-url?contenttype=application/octet-stream&name=${path.basename(
@@ -63,7 +68,7 @@ async function convertPdfToText(
   password: string,
   pages: string,
   destinationFile: string
-): Promise<void> {
+): Promise<ConvertPdfToTextResponse | undefined> {
   const queryPath = `/v1/pdf/convert/to/text`;
 
   const jsonPayload = JSON.stringify({
@@ -106,8 +111,9 @@ async function convertPdfToText(
         data.resultFileUrl,
         destinationFile
       );
-      return result;
+      return result as ConvertPdfToTextResponse;
     }
+    return undefined;
   } catch (error) {
     console.error("convertPdfToText(): " + error);
   }
@@ -117,7 +123,7 @@ async function checkIfJobIsCompleted(
   jobId: string,
   resultFileUrl: string,
   destinationFile: string
-): Promise<void> {
+): Promise<ConvertPdfToTextResponse | undefined> {
   const queryPath = `/v1/job/check`;
 
   let jsonPayload = JSON.stringify({
@@ -148,7 +154,7 @@ async function checkIfJobIsCompleted(
       rawData += chunk;
     }
 
-    const data = JSON.parse(rawData);
+    const data = JSON.parse(rawData) as ConvertPdfToTextResponse;
     console.log(
       `Checking Job #${jobId}, Status: ${
         data.status
@@ -161,7 +167,7 @@ async function checkIfJobIsCompleted(
     } else if (data.status === "success") {
       return data;
     } else {
-      console.log(`Operation ended with status: "${data.status}".`);
+      throw new Error(`Operation ended with status: "${data.status}".`);
     }
   } catch (error) {
     console.error("Error in checkIfJobIsCompleted:", error);
@@ -202,7 +208,7 @@ export default defineEventHandler(async (event) => {
     await uploadFile(fileData, uploadUrl);
 
     // 3. CONVERT UPLOADED PDF FILE TO TEXT
-    const result = await convertPdfToText(
+    const { url } = await convertPdfToText(
       API_KEY,
       uploadedFileUrl,
       "",
@@ -210,7 +216,14 @@ export default defineEventHandler(async (event) => {
       fileName
     );
 
-    const textContent = await $fetch(result.url);
+    if (!url) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Failed to convert PDF to text. Please try again later.",
+      });
+    }
+
+    const textContent: string = await $fetch(url);
 
     const uploadData = await $fetch("/api/files/get-signed-url", {
       method: "PUT",
