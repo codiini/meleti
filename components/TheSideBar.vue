@@ -38,5 +38,11 @@ const links = [
     to: "",
     badge: "Coming Soon",
   },
+  {
+    label: "Interakt",
+    icon: "i-heroicons-chat-bubble-left-right-20-solid",
+    to: "",
+    badge: "Coming Soon",
+  },
 ];
 </script>
