@@ -28,10 +28,17 @@
           }}%)
         </p>
 
-        <div>
-          <UButton to="/dashboard/tests" color="primary">
+        <div class="flex items-center justify-start gap-x-4">
+          <UButton to="/dashboard/tests" variant="outline">
             Go Back to Test Dashboard
           </UButton>
+          <UButton
+            @click="refreshBrowser"
+            color="primary"
+            icon="i-heroicons-arrow-path-solid"
+          >
+            Retake test</UButton
+          >
         </div>
       </div>
     </UCard>
@@ -54,5 +61,9 @@ const emit = defineEmits<{
 
 const closeModal = () => {
   emit("close");
+};
+
+const refreshBrowser = () => {
+  window.location.reload();
 };
 </script>

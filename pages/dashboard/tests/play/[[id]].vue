@@ -122,11 +122,13 @@ import type {
   RouteLocationNormalizedLoadedGeneric,
   RouteLocationNormalizedGeneric,
 } from "#vue-router";
+import { useTests } from "~/composables/useTests";
 import type { Question, TestInfo } from "~/types/questions";
 
 type TypeSelectedOption = keyof typeof userAnswers.value;
 
 const supabase = useSupabaseClient();
+const { saveTestResults } = useTests();
 const route = useRoute();
 
 const isLoadingQuestions = ref(false);
@@ -139,12 +141,13 @@ const testInfo: TestInfo = reactive({
   questions: [],
 });
 
+const testTimer = ref(0);
+
 const startTime = ref(0);
 const endTime = ref(0);
 
 const testScore = ref(0);
 const showResults = ref(false);
-const scorePercentage = ref(0);
 const isQuizCompleted = ref(false);
 
 const userAnswers = ref({});
@@ -152,8 +155,8 @@ const remainingTime = ref();
 const isLeaveTestModalOpen = ref(false);
 
 const formattedTime = computed(() => {
-  const minutes = Math.floor(testInfo.duration / 60);
-  const seconds = testInfo.duration % 60;
+  const minutes = Math.floor(testTimer.value / 60);
+  const seconds = testTimer.value % 60;
   return `${minutes.toString().padStart(2, "0")}:${seconds
     .toString()
     .padStart(2, "0")}`;
@@ -178,9 +181,7 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-  clearInterval(timer);
-  localStorage.removeItem(`${route.params.id}_s`);
-  localStorage.removeItem(`${route.params.id}_e`);
+  removeTimer();
 });
 
 const initializeTimer = () => {
@@ -192,10 +193,10 @@ const initializeTimer = () => {
     endTime.value = parseInt(storedEndTime);
     const now = Date.now();
     const remainingDuration = Math.max(0, endTime.value - now);
-    testInfo.duration = Math.floor(remainingDuration / 1000);
+    testTimer.value = Math.floor(remainingDuration / 1000);
   } else {
     startTime.value = Date.now();
-    endTime.value = startTime.value + testInfo.duration * 1000;
+    endTime.value = startTime.value + testTimer.value * 1000;
     localStorage.setItem(`${route.params.id}_s`, startTime.value.toString());
     localStorage.setItem(`${route.params.id}_e`, endTime.value.toString());
   }
@@ -203,19 +204,28 @@ const initializeTimer = () => {
   timer = setInterval(() => {
     const now = Date.now();
     const remainingDuration = Math.max(0, endTime.value - now);
-    testInfo.duration = Math.floor(remainingDuration / 1000);
+    testTimer.value = Math.floor(remainingDuration / 1000);
 
-    if (testInfo.duration <= 0) {
-      clearInterval(timer);
+    if (testTimer.value <= 0) {
+      removeTimer();
       submitAnswers();
     }
   }, 1000);
+};
+
+const removeTimer = () => {
+  clearInterval(timer);
+  localStorage.removeItem(`${route.params.id}_s`);
+  localStorage.removeItem(`${route.params.id}_e`);
 };
 
 const submitAnswers = () => {
   if (testScore.value) {
     return;
   }
+
+  const timeTaken = Date.now() - startTime.value;
+  const timeTakenInSeconds = Math.floor(timeTaken / 1000);
 
   testInfo.questions.map((question: Question) => {
     const correctAnswer = question.correctAnswer;
@@ -228,19 +238,25 @@ const submitAnswers = () => {
       testScore.value++;
     }
   });
-  showAnswers();
+  showAnswers(timeTakenInSeconds);
 };
 
-const showAnswers = () => {
-  showResults.value = true;
-
+const showAnswers = async (timeTakenInSeconds: number) => {
   const totalQuestions = testInfo.questions.length;
-  scorePercentage.value = Math.round((testScore.value / totalQuestions) * 100);
+  const scorePercentage = Math.round((testScore.value / totalQuestions) * 100);
 
   isQuizCompleted.value = true;
 
-  clearInterval(timer);
-  // saveResultsToDatabase();
+  await saveTestResults({
+    testId: testInfo.id,
+    score: scorePercentage,
+    totalQuestions,
+    correctAnswers: testScore.value,
+    timeTaken: timeTakenInSeconds,
+    duration: testInfo.duration,
+  });
+
+  showResults.value = true;
 };
 
 const fetchTestInfo = async () => {
@@ -253,6 +269,7 @@ const fetchTestInfo = async () => {
     console.error(error);
   }
   Object.assign(testInfo, data[0]);
+  testTimer.value = data[0].duration;
 };
 
 const clearSelectedOption = (id: TypeSelectedOption) => {
