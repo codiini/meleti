@@ -82,13 +82,15 @@ export const useCourses = () => {
 
   const createCourse = async (title: string, description: string) => {
     loadingStates.save = true;
-    const { data, error } = await supabase
+    const colorCode = generateUniqueColors(1000);
+    const { error } = await supabase
       .from("courses")
       .insert([
         {
           title: title,
           description: description,
           user_id: user.value?.id,
+          color_code: colorCode,
         },
       ])
       .select();
