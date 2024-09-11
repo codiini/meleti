@@ -33,7 +33,6 @@
               v-model="formState.testType"
               :options="testTypeOptions"
               placeholder="Select question type"
-              class="bg-gray-800 text-white"
             />
           </UFormGroup>
 
@@ -43,7 +42,6 @@
               v-model="formState.difficulty"
               :options="difficultyOptions"
               placeholder="Select difficulty"
-              class="bg-gray-800 text-white"
             />
           </UFormGroup>
 

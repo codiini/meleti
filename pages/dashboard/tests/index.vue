@@ -40,7 +40,7 @@
           v-for="test in tests"
           :key="test.id"
           :title="test.title"
-          class="bg-white dark:bg-gray-900 text-white"
+          class="dark:bg-gray-900"
         >
           <template #header>
             <div class="flex justify-between items-center">
@@ -49,7 +49,9 @@
             </div>
           </template>
           <div class="h-20">
-            <h3 class="text-lg font-semibold">{{ test.title }}</h3>
+            <h3 class="text-lg font-semibold">
+              {{ test.title }}
+            </h3>
             <p>{{ test?.description }}</p>
           </div>
           <template #footer>

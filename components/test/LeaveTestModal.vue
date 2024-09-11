@@ -18,7 +18,7 @@
         </div>
       </template>
 
-      <p class="text-gray-500">
+      <p class="dark:text-gray-500">
         Are you sure you want to leave the test without submitting your answers?
       </p>
 

@@ -2,10 +2,10 @@
   <div class="ml-64 p-8">
     <!-- Header -->
     <header class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-800">
+      <h1 class="text-3xl font-bold dark:text-gray-800">
         Welcome {{ computedUserName }}!
       </h1>
-      <p class="text-gray-600">Your AI-powered exam preparation toolkit</p>
+      <p class="dark:text-gray-600">Your AI-powered exam preparation toolkit</p>
     </header>
 
     <!-- Quick Actions -->
@@ -15,7 +15,7 @@
           <h2 class="text-lg font-semibold">Add new Course</h2>
         </template>
         <UButton
-          to="/dashboard/courses"
+          to="/dashboard/courses?new=true"
           icon="i-heroicons-plus"
           label="Add Course"
           color="primary"

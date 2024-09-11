@@ -9,7 +9,7 @@
     >
       <UCard class="w-full max-w-md">
         <template #header>
-          <h1 class="text-2xl font-bold text-center text-gray-100">
+          <h1 class="text-2xl font-bold text-center dark:text-gray-100">
             Create your Account
           </h1>
         </template>

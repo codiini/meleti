@@ -30,7 +30,7 @@
           class="rounded-lg"
         >
           <template #header>
-            <div class="text-xl font-semibold text-white">
+            <div class="text-xl font-semibold">
               {{ index + 1 }}). {{ question }}
             </div>
           </template>

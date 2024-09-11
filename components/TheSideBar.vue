@@ -1,7 +1,7 @@
 <template>
   <UVerticalNavigation
     :ui="{
-      active: 'text-primary-200 border-current font-medium',
+      active: 'border-current font-medium',
       size: 'text-md',
       wrapper: 'pt-10 h-full px-2 bg-gray-300',
       base: 'my-4 py-3',
