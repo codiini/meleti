@@ -43,14 +43,14 @@ export const useTests = () => {
     }
   };
 
-  const getTestResults = async (limit: number = 3) => {
+  const getTestResults = async () => {
     try {
       const { data, error } = await supabase
         .from("test_results")
-        .select("*, tests(course_id(title), title)")
+        .select("*, tests(course_id(id, title, color_code), title)")
         .eq("user_id", user.value?.id)
-        .order("completed_at", { ascending: false })
-        .limit(limit);
+        .order("completed_at", { ascending: false });
+      // .limit(limit); // TODO: Implement limit and pagination
 
       if (error) {
         throw error;

@@ -18,5 +18,9 @@
     "@nuxtjs/supabase": "^1.4.0",
     "nuxt": "^3.12.4",
     "zod": "^3.23.8"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.4",
+    "vue-chartjs": "^5.3.1"
   }
 }

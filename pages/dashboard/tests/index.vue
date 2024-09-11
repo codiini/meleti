@@ -46,8 +46,8 @@
           v-for="{
             id,
             title,
-            created_at,
             questions,
+            course_id,
             description,
             deleting,
           } in tests"
@@ -57,7 +57,7 @@
         >
           <template #header>
             <div class="flex justify-between items-center">
-              <span>{{ formatDate(created_at) }}</span>
+              <span>{{ course_id.title }}</span>
               <span>{{ questions.length }} questions</span>
             </div>
           </template>
@@ -115,7 +115,9 @@ const tests = ref([]);
 const loading = ref(true);
 
 const fetchTests = async () => {
-  const { data, error } = await supabase.from("tests").select("*");
+  const { data, error } = await supabase
+    .from("tests")
+    .select("*, course_id(title)");
   if (error) {
     console.error("Error fetching tests:", error);
   } else {

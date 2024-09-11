@@ -49,7 +49,10 @@
       </template>
       <!-- Add a chart component here -->
       <div class="h-64 flex items-center justify-center">
-        <DashboardPerformanceChart />
+        <DashboardPerformanceChart
+          v-if="testResults.length > 0"
+          :testResults="testResults"
+        />
       </div>
     </UCard>
   </div>
@@ -60,6 +63,7 @@ const user = useSupabaseUser();
 const { getTestResults } = useTests();
 
 const computedUserName = computed(() => user.value?.user_metadata.firstname);
+const testResults = ref([]);
 
 const columns = [
   { key: "date", label: "Date" },
@@ -70,10 +74,9 @@ const columns = [
 
 const rows = ref([]);
 
-onMounted(async () => {
-  const testResults = await getTestResults();
-  console.log(testResults);
-  rows.value = testResults.map((test: any) => ({
+onBeforeMount(async () => {
+  testResults.value = await getTestResults();
+  rows.value = testResults.value.slice(0, 3).map((test: any) => ({
     date: formatDate(test.completed_at),
     test: test.tests.title,
     course: test.tests.course_id.title,
