@@ -1,4 +1,4 @@
-import type { CourseFile, Course } from "~/types/courses";
+import type { Course } from "~/types/courses";
 
 export const useCourses = () => {
   const supabase = useSupabaseClient();

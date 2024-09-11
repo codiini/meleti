@@ -101,8 +101,9 @@ const handleLogin = async () => {
 
   toast.add({
     title: "Sign in Successful",
+    description: "Redirecting you to your dashboard...",
     icon: "i-heroicons-check-badge-solid",
+    callback: () => navigateTo("/dashboard"),
   });
-  setTimeout(() => navigateTo("/dashboard"), 1500);
 };
 </script>
