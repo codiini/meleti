@@ -44,22 +44,58 @@ export const useTests = () => {
   };
 
   const getTestResults = async (limit: number = 3) => {
-    const { data, error } = await supabase
-      .from("test_results")
-      .select("*, tests(course_id, title)")
-      .eq("user_id", user.value?.id)
-      .order("completed_at", { ascending: false })
-      .limit(limit);
+    try {
+      const { data, error } = await supabase
+        .from("test_results")
+        .select("*, tests(course_id(title), title)")
+        .eq("user_id", user.value?.id)
+        .order("completed_at", { ascending: false })
+        .limit(limit);
 
-    if (error) {
+      if (error) {
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      toast.add({
+        title: "Test Results",
+        description: "There was an error fetching your test results",
+        color: "red",
+      });
+
       throw error;
     }
-
-    return data;
   };
 
+  const deleteTest = async (testId: string) => {
+    try {
+      const { error } = await supabase.from("tests").delete().eq("id", testId);
+
+      if (error) {
+        throw error;
+      }
+
+      toast.add({
+        title: "Test Deleted Successfully!",
+        icon: "i-heroicons-check-badge-20-solid",
+      });
+
+      return { error };
+    } catch (e: any) {
+      toast.add({
+        title: "Test Results",
+        description: e.statusMessage,
+        icon: "i-heroicons-exclamation-circle",
+        color: "red",
+      });
+
+      throw e;
+    }
+  };
   return {
     saveTestResults,
     getTestResults,
+    deleteTest,
   };
 };

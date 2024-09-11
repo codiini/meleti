@@ -145,7 +145,6 @@ export const useCourses = () => {
         icon: "i-heroicons-check-badge-solid",
       });
     } catch (e: any) {
-      console.error(e);
       toast.add({
         title: "Error Deleting Study Material",
         description: e.statusMessage,
