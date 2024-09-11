@@ -310,6 +310,19 @@ const fetchCourseFiles = async (id: string) => {
     })) || [];
 };
 
+const route = useRoute();
+
+watch(
+  () => route.query,
+
+  () => {
+    if (route.query.new) {
+      showAddCourseModal.value = true;
+    }
+  },
+  { immediate: true }
+);
+
 onMounted(async () => {
   await fetchCourses();
 });

@@ -1,6 +1,5 @@
 <template>
-  <div class="p-6 text-gray-900">
-    <!-- User menu -->
+  <div class="p-6 dark:text-gray-900">
     <div class="flex justify-between items-center mb-8">
       <UDropdown :items="items" :popper="{ placement: 'bottom-start' }">
         <UButton color="black" variant="outline">
@@ -36,21 +35,8 @@ const items = [
   [
     {
       label: "Profile",
-      avatar: {
-        src: "https://avatars.githubusercontent.com/u/739984?v=4",
-      },
+      icon: "i-heroicons-user-circle-20-solid",
     },
-  ],
-  [
-    {
-      label: "Settings",
-      icon: "i-heroicons-pencil-square-20-solid",
-      click: () => {
-        navigateTo("/profile/settings");
-      },
-    },
-  ],
-  [
     {
       label: "Logout",
       icon: "i-heroicons-arrow-right-circle-20-solid",
