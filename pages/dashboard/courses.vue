@@ -127,7 +127,7 @@
                     />
                     <UIcon
                       v-else
-                      name="i-heroicons-trash-solid"
+                      name="i-heroicons-trash-20-solid"
                       class="w-5 h-5"
                     />
                   </UButton>
@@ -295,6 +295,7 @@ const handleFileUpload = async (file: (string | Blob)[]) => {
       title: "Upload Failed",
       description: "There was an error uploading your file. Please try again.",
       icon: "i-heroicons-exclamation-circle",
+      color: "red",
     });
   } finally {
     isFileUploading.value = false;

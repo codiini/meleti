@@ -1,11 +1,12 @@
 <template>
-  <div class="ml-64 p-8 relative text-gray-900">
-    <div class="flex flex-col">
+  <div class="ml-64 p-8 relative">
+    <div class="flex flex-col max-w-fit">
       <UButton
         to="/dashboard/tests"
         icon="i-heroicons-arrow-long-left-16-solid"
         color="black"
         variant="ghost"
+        class="text-gray-900 w-full"
       >
         Go Back
       </UButton>
@@ -22,7 +23,10 @@
     <!-- Add loading state -->
     <TestPageSkeletonLoader v-if="isLoadingQuestions" />
     <!-- Questions List -->
-    <div v-else class="flex items-start justify-start">
+    <div
+      v-else-if="testInfo.questions.length"
+      class="flex items-start justify-start"
+    >
       <div class="space-y-4 p-6">
         <UCard
           v-for="({ id, question, options }, index) in testInfo.questions"
@@ -89,7 +93,7 @@
 
       <div class="sticky top-20">
         <div
-          class="text-2xl font-bold rounded border-2 border-gray-900 p-2 w-40 flex items-center justify-center"
+          class="text-2xl text-gray-900 font-bold rounded border-2 border-gray-900 p-2 w-40 flex items-center justify-center"
           :class="{
             'bg-green-500': remainingTime > 0,
             'bg-red-500': remainingTime <= 59,

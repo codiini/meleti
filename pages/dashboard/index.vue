@@ -63,7 +63,8 @@ const computedUserName = computed(() => user.value?.user_metadata.firstname);
 
 const columns = [
   { key: "date", label: "Date" },
-  { key: "activity", label: "Activity" },
+  { key: "test", label: "Test" },
+  { key: "course", label: "Course" },
   { key: "score", label: "Score" },
 ];
 
@@ -74,7 +75,8 @@ onMounted(async () => {
   console.log(testResults);
   rows.value = testResults.map((test: any) => ({
     date: formatDate(test.completed_at),
-    activity: test.tests.title,
+    test: test.tests.title,
+    course: test.tests.course_id.title,
     score: `${test.score}%`,
   }));
 });

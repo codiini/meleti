@@ -103,6 +103,7 @@ const handleLogin = async () => {
     title: "Sign in Successful",
     description: "Redirecting you to your dashboard...",
     icon: "i-heroicons-check-badge-solid",
+    timeout: 2000,
     callback: () => navigateTo("/dashboard"),
   });
 };
