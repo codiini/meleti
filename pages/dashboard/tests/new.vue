@@ -229,24 +229,6 @@ const handleTestCreation = async () => {
   } finally {
     loadingStates.testCreation = false;
   }
-
-  // const { data, error } = await supabase
-  //   .from("tests")
-  //   .insert([
-  //     {
-  //       course_id: formState.selectedCourse,
-  //       title: formState.title,
-  //       questions: questions,
-  //     },
-  //   ])
-  //   .select();
-
-  // if (error) {
-  //   console.error("Error creating test:", error);
-  // } else {
-  //   console.log("Test created successfully:", data);
-  // }
-  // loadingStates.testCreation = true;
 };
 
 const fetchCourseFiles = async () => {

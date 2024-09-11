@@ -1,3 +1,12 @@
+type TestResults = {
+  testId: string;
+  score: number;
+  totalQuestions: number;
+  correctAnswers: number;
+  timeTaken: number;
+  duration: number;
+};
+
 export const useTests = () => {
   const supabase = useSupabaseClient();
   const user = useSupabaseUser();
@@ -10,14 +19,7 @@ export const useTests = () => {
     correctAnswers,
     timeTaken,
     duration,
-  }: {
-    testId: string;
-    score: number;
-    totalQuestions: number;
-    correctAnswers: number;
-    timeTaken: number;
-    duration: number;
-  }) => {
+  }: TestResults) => {
     try {
       const { error } = await supabase.from("test_results").insert({
         user_id: user.value?.id,
@@ -41,7 +43,23 @@ export const useTests = () => {
     }
   };
 
+  const getTestResults = async (limit: number = 3) => {
+    const { data, error } = await supabase
+      .from("test_results")
+      .select("*, tests(course_id, title)")
+      .eq("user_id", user.value?.id)
+      .order("completed_at", { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  };
+
   return {
     saveTestResults,
+    getTestResults,
   };
 };

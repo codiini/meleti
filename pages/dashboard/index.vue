@@ -48,8 +48,8 @@
         <h2 class="text-xl font-semibold">Performance Overview</h2>
       </template>
       <!-- Add a chart component here -->
-      <div class="h-64 bg-gray-200 flex items-center justify-center">
-        <p class="text-gray-600">Chart placeholder</p>
+      <div class="h-64 flex items-center justify-center">
+        <DashboardPerformanceChart />
       </div>
     </UCard>
   </div>
@@ -57,6 +57,7 @@
 
 <script lang="ts" setup>
 const user = useSupabaseUser();
+const { getTestResults } = useTests();
 
 const computedUserName = computed(() => user.value?.user_metadata.firstname);
 
@@ -66,9 +67,15 @@ const columns = [
   { key: "score", label: "Score" },
 ];
 
-const rows = [
-  { date: "2024-08-28", activity: "Math Test", score: "85%" },
-  { date: "2024-08-27", activity: "Science Quiz", score: "92%" },
-  { date: "2024-08-25", activity: "History Exam", score: "78%" },
-];
+const rows = ref([]);
+
+onMounted(async () => {
+  const testResults = await getTestResults();
+  console.log(testResults);
+  rows.value = testResults.map((test: any) => ({
+    date: formatDate(test.completed_at),
+    activity: test.tests.title,
+    score: `${test.score}%`,
+  }));
+});
 </script>
