@@ -24,9 +24,15 @@
             </template>
             <div class="h-6 bg-gray-400 rounded mt-2"></div>
             <template #footer>
-              <div class="flex space-x-4 mt-4">
-                <div class="h-8 bg-gray-400 rounded w-20"></div>
-                <div class="h-8 bg-gray-400 rounded w-20"></div>
+              <div class="flex justify-between mt-4">
+                <div class="flex gap-x-2">
+                  <div class="h-8 bg-gray-400 rounded w-20"></div>
+                  <div class="h-8 bg-gray-400 rounded w-20"></div>
+                </div>
+
+                <div>
+                  <div class="h-8 bg-gray-400 rounded w-10"></div>
+                </div>
               </div>
             </template>
           </UCard>
@@ -37,36 +43,62 @@
 
       <template v-else>
         <UCard
-          v-for="test in tests"
-          :key="test.id"
-          :title="test.title"
+          v-for="{
+            id,
+            title,
+            created_at,
+            questions,
+            description,
+            deleting,
+          } in tests"
+          :key="id"
+          :title="title"
           class="dark:bg-gray-900"
         >
           <template #header>
             <div class="flex justify-between items-center">
-              <span>{{ formatDate(test.created_at) }}</span>
-              <span>{{ test.questions.length }} questions</span>
+              <span>{{ formatDate(created_at) }}</span>
+              <span>{{ questions.length }} questions</span>
             </div>
           </template>
           <div class="h-20">
             <h3 class="text-lg font-semibold">
-              {{ test.title }}
+              {{ title }}
             </h3>
-            <p>{{ test?.description }}</p>
+            <p>{{ description }}</p>
           </div>
           <template #footer>
-            <div class="flex gap-x-2">
+            <div class="flex justify-between">
+              <div class="flex gap-x-2">
+                <UButton
+                  disabled
+                  label="Edit"
+                  variant="outline"
+                  class="w-20 flex justify-center"
+                />
+                <UButton
+                  :to="`/dashboard/tests/play/${id}`"
+                  label="Start"
+                  color="primary"
+                  class="w-20 flex justify-center"
+                />
+              </div>
+
+              <UButton v-if="deleting" disabled color="red" variant="ghost">
+                <UIcon
+                  size="18"
+                  name="i-heroicons-arrow-path-20-solid"
+                  class="animate-spin flex items-end"
+                />
+              </UButton>
+
               <UButton
-                disabled
-                label="Edit"
-                variant="outline"
-                class="w-20 flex justify-center"
-              />
-              <UButton
-                :to="`/dashboard/tests/play/${test.id}`"
-                label="Start"
-                color="primary"
-                class="w-20 flex justify-center"
+                v-else
+                color="red"
+                @click="deleteTest(id)"
+                icon="i-heroicons-trash-20-solid"
+                class="flex items-end"
+                variant="ghost"
               />
             </div>
           </template>
@@ -82,13 +114,35 @@ const supabase = useSupabaseClient();
 const tests = ref([]);
 const loading = ref(true);
 
-onMounted(async () => {
+const fetchTests = async () => {
   const { data, error } = await supabase.from("tests").select("*");
   if (error) {
     console.error("Error fetching tests:", error);
   } else {
     tests.value = data;
+    tests.value = tests.value.map((test) => ({
+      ...test,
+      deleting: false,
+    }));
   }
   loading.value = false;
+};
+
+const deleteTest = async (id: string) => {
+  tests.value = tests.value.map((test) =>
+    test.id === id ? { ...test, deleting: true } : test
+  );
+  const { error } = await supabase.from("tests").delete().eq("id", id);
+
+  if (!error) {
+    await fetchTests();
+  }
+  tests.value = tests.value.map((test) =>
+    test.id === id ? { ...test, deleting: false } : test
+  );
+};
+
+onMounted(async () => {
+  await fetchTests();
 });
 </script>
