@@ -218,10 +218,11 @@ const handleTestCreation = async () => {
       },
     });
   } catch (error) {
-    console.error("Error generating test:", error.statusMessage);
+    console.error("Error generating test:", error);
     toast.add({
-      title: "Error",
-      description: error.statusMessage,
+      title: "Error while generating test",
+      icon: "i-heroicons-exclamation-circle",
+      description: error.message,
       color: "red",
     });
   } finally {

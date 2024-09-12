@@ -23,11 +23,8 @@
     <!-- Add loading state -->
     <TestPageSkeletonLoader v-if="isLoadingQuestions" />
     <!-- Questions List -->
-    <div
-      v-else-if="testInfo.questions.length"
-      class="flex items-start justify-start"
-    >
-      <div class="space-y-4 p-6">
+    <div v-else-if="testInfo.questions.length" class="flex justify-between">
+      <div class="flex-1 space-y-4 p-6">
         <UCard
           v-for="({ id, question, options }, index) in testInfo.questions"
           :key="id"

@@ -20,9 +20,7 @@
     "zod": "^3.23.8"
   },
   "dependencies": {
-    "@vercel/functions": "^1.4.1",
     "chart.js": "^4.4.4",
-    "google-auth-library": "^9.14.1",
     "vue-chartjs": "^5.3.1"
   }
 }

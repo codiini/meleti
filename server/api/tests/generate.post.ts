@@ -80,10 +80,7 @@ export default defineEventHandler(async (event) => {
     console.log("error: ", error);
     throw createError({
       statusCode: 500,
-      statusMessage:
-        error.statusMessage ||
-        error.message ||
-        "Error generating test questions",
+      statusMessage: error.message || "Error generating test questions",
     });
   }
 });
