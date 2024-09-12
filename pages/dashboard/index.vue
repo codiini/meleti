@@ -39,7 +39,23 @@
       <template #header>
         <h2 class="text-xl font-semibold">Recent Activity</h2>
       </template>
-      <UTable :columns="columns" :rows="rows" />
+      <UTable :columns="columns" :rows="rows">
+        <template #empty-state>
+          <div class="flex flex-col items-center justify-center py-6 gap-3">
+            <h3 class="italic">Oops! No recent activity found</h3>
+            <p class="text-sm">
+              Start by creating a new course or adding a new test
+            </p>
+            <div class="flex gap-3">
+              <UButton
+                label="Add Course"
+                to="/dashboard/courses?new=true"
+                color="primary"
+              />
+            </div>
+          </div>
+        </template>
+      </UTable>
     </UCard>
 
     <!-- Performance Overview -->
@@ -53,6 +69,19 @@
           v-if="testResults.length > 0"
           :testResults="testResults"
         />
+        <template v-else>
+          <div class="flex flex-col items-center justify-center py-6 gap-3">
+            <h3 class="italic">Oops! No recent activity found</h3>
+            <p class="text-sm">Start by creating and taking a test</p>
+            <div class="flex gap-3">
+              <UButton
+                label="Create Test"
+                to="/dashboard/tests"
+                color="primary"
+              />
+            </div>
+          </div>
+        </template>
       </div>
     </UCard>
   </div>

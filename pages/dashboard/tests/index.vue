@@ -42,6 +42,20 @@
       <!-- Test Cards -->
 
       <template v-else>
+        <div v-if="tests.length == 0">
+          <UCard>
+            <template #header>
+              <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold">No tests found</h3>
+                <UButton
+                  to="/dashboard/tests/new"
+                  label="Create New Test"
+                  color="primary"
+                />
+              </div>
+            </template>
+          </UCard>
+        </div>
         <UCard
           v-for="{
             id,
@@ -110,6 +124,7 @@
 
 <script setup lang="ts">
 const supabase = useSupabaseClient();
+const toast = useToast();
 
 const tests = ref([]);
 const loading = ref(true);
@@ -136,12 +151,20 @@ const deleteTest = async (id: string) => {
   );
   const { error } = await supabase.from("tests").delete().eq("id", id);
 
-  if (!error) {
-    await fetchTests();
+  if (error) {
+    toast.add({
+      title: "Error Deleting Test",
+      description:
+        "There was an error deleting the selected test. Please try again later.",
+      icon: "i-heroicons-exclamation-circle",
+      color: "red",
+    });
   }
-  tests.value = tests.value.map((test) =>
-    test.id === id ? { ...test, deleting: false } : test
-  );
+  await fetchTests();
+  toast.add({
+    title: "Test deleted Successfully",
+    icon: "i-heroicons-check-circle",
+  });
 };
 
 onMounted(async () => {
