@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
     try {
       await s3Client.send(command);
       const { error, data } = await supabaseClient
-        .from("course_file")
+        .from("course_files")
         .delete()
         .eq("unique_file_name", fileId);
 
