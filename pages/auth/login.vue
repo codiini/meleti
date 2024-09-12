@@ -4,7 +4,7 @@
       ref="form"
       :schema="schema"
       :state="formState"
-      class="min-h-screen flex items-center justify-center"
+      class="flex items-center justify-center"
     >
       <UCard class="w-full max-w-md">
         <template #header>
@@ -21,11 +21,23 @@
             />
           </UFormGroup>
           <UFormGroup label="Password" name="password">
-            <UInput
-              v-model="formState.password"
-              type="password"
-              placeholder="••••••••"
-            />
+            <div class="relative">
+              <UInput
+                v-model="formState.password"
+                :type="showPassword ? 'text' : 'password'"
+                placeholder="••••••••"
+              />
+              <UButton
+                :icon="
+                  showPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'
+                "
+                variant="ghost"
+                color="gray"
+                size="xs"
+                class="absolute right-2 top-1/2 -translate-y-1/2"
+                @click="showPassword = !showPassword"
+              />
+            </div>
           </UFormGroup>
           <div class="flex items-center justify-between">
             <UCheckbox v-model="formState.rememberMe" label="Remember me" />
@@ -70,6 +82,7 @@ useHead({
 });
 
 const isLoading = ref(false);
+const showPassword = ref(false);
 const form = ref();
 
 const formState = reactive({

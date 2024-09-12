@@ -3,6 +3,9 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ["@nuxt/ui", "@nuxtjs/supabase"],
   compatibilityDate: "2024-08-30",
+  devServer: {
+    host: "0.0.0.0",
+  },
   supabase: {
     redirect: false,
     redirectOptions: {

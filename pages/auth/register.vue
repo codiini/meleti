@@ -4,7 +4,7 @@
       ref="form"
       :schema="schema"
       :state="formState"
-      class="space-y-4 min-h-screen w-full flex items-center justify-center"
+      class="space-y-4 w-full flex items-center justify-center"
       @submit="handleRegister"
     >
       <UCard class="w-full max-w-md">
