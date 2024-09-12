@@ -138,7 +138,7 @@ export const useCourses = () => {
       await $fetch("/api/files/delete", {
         method: "DELETE",
         params: {
-          id: "122334343",
+          id,
         },
       });
 
