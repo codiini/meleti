@@ -64,11 +64,11 @@ export default defineEventHandler(async (event) => {
         },
       ])
       .select();
-      
+
     if (error) {
       throw createError({
         statusCode: 500,
-        statusMessage: "Error generating test questions",
+        statusMessage: error.message,
       });
     }
 
@@ -76,10 +76,14 @@ export default defineEventHandler(async (event) => {
       statusCode: 200,
       data: data[0],
     };
-  } catch (error) {
+  } catch (error: any) {
+    console.log("error: ", error);
     throw createError({
       statusCode: 500,
-      statusMessage: "Error generating test questions",
+      statusMessage:
+        error.statusMessage ||
+        error.message ||
+        "Error generating test questions",
     });
   }
 });

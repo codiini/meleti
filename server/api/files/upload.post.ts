@@ -249,10 +249,10 @@ export default defineEventHandler(async (event) => {
           "Content-Type": "text/plain",
         },
       });
-    } catch (error) {
+    } catch (error: any) {
       throw createError({
         statusCode: 500,
-        statusMessage: "Failed to upload text content. Please try again later.",
+        statusMessage: error.message,
       });
     }
 
@@ -273,8 +273,7 @@ export default defineEventHandler(async (event) => {
     if (error) {
       throw createError({
         statusCode: 500,
-        statusMessage:
-          "An error occured during file upload. Please try again later.",
+        statusMessage: error.message,
       });
     }
 
@@ -282,11 +281,10 @@ export default defineEventHandler(async (event) => {
       statusCode: 200,
       data: materialData[0],
     };
-  } catch (e) {
+  } catch (error: any) {
     throw createError({
       statusCode: 500,
-      statusMessage:
-        "An error occured during file upload. Please try again later.",
+      statusMessage: error.message,
     });
   }
 });

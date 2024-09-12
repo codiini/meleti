@@ -43,11 +43,11 @@ export default defineEventHandler(async (event) => {
       fileUrl: `https://${process.env.R2_BUCKET_NAME}.${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com/${uniqueFileName}`,
       statusCode: 200,
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error generating signed URL:", error);
     throw createError({
       statusCode: 500,
-      statusMessage: "Error generating signed URL",
+      statusMessage: error.message,
     });
   }
 });

@@ -141,7 +141,7 @@ const generatedQuestions = ref([]);
 const formState = reactive({
   title: "",
   difficulty: "medium",
-  maxQuestions: 20,
+  maxQuestions: 10,
   testType: "multiple_choice",
   courseFiles: [],
   selectedCourse: "",

@@ -32,19 +32,17 @@ export default defineEventHandler(async (event) => {
       if (error) {
         throw createError({
           statusCode: 500,
-          statusMessage:
-            "There was an error deleting the study material. Please try again later.",
+          statusMessage: error.message,
         });
       }
       return {
         statusCode: 204,
         body: data,
       };
-    } catch (error) {
+    } catch (error: any) {
       throw createError({
         statusCode: 500,
-        statusMessage:
-          "There was an error deleting the study material. Please try again later.",
+        statusMessage: error.message,
       });
     }
   };
