@@ -148,7 +148,6 @@ export const useCourses = () => {
         method: "DELETE",
         params: {
           id,
-          userId: user.value?.id,
         },
       });
 

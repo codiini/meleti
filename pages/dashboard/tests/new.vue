@@ -134,7 +134,6 @@
 const { fetchCourses, coursesList } = useCourses();
 const toast = useToast();
 const supabase = useSupabaseClient();
-const user = useSupabaseUser();
 
 useHead({
   title: "Meleti | Create New Test",
@@ -207,7 +206,6 @@ const handleTestCreation = async () => {
         testType: formState.testType,
         duration: formState.duration,
         description: formState.description,
-        userId: user.value?.id,
       },
     });
 

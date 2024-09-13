@@ -9,6 +9,16 @@ const cleanOutput = (output: string) => {
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
+  const userId = (await serverSupabaseClient(event).auth.getUser()).data.user
+    ?.id;
+
+  if (!userId) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+    });
+  }
+
   const {
     fileId,
     maxQuestions,
@@ -18,7 +28,6 @@ export default defineEventHandler(async (event) => {
     testType,
     duration,
     description,
-    userId,
   } = body;
 
   const supabaseClient = await serverSupabaseClient(event);

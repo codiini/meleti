@@ -3,9 +3,16 @@ import { serverSupabaseClient } from "#supabase/server";
 
 export default defineEventHandler(async (event) => {
   const supabaseClient = await serverSupabaseClient(event);
+  const userId = (await supabaseClient.auth.getUser()).data.user?.id;
+
+  if (!userId) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+    });
+  }
 
   const fileId = getQuery(event).id as string;
-  const userId = getQuery(event).userId as string;
 
   const s3Client = new S3Client({
     endpoint: process.env.R2_ENDPOINT,

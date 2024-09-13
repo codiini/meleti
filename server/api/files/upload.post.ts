@@ -179,6 +179,13 @@ export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event);
   const userId = (await client.auth.getUser()).data.user?.id;
 
+  if (!userId) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+    });
+  }
+
   const body = await readMultipartFormData(event);
 
   if (!body) {
