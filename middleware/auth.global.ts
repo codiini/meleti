@@ -12,7 +12,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     return navigateTo("/dashboard");
   }
 
-  if (to.path === "/auth/new-password" && to.query.code) {
+  if (
+    (to.path === "/auth/new-password" || to.path === "/auth/confirm") &&
+    to.query.code
+  ) {
     return;
   }
 

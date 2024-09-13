@@ -1,5 +1,5 @@
 <template>
-  <div class="ml-64 p-8">
+  <div class="lg:ml-64 lg:p-8 p-4">
     <h1 class="text-3xl font-bold mb-8 text-gray-800">Course Management</h1>
 
     <template v-if="loadingStates.fetch">

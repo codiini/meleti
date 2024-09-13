@@ -1,5 +1,5 @@
 <template>
-  <div class="ml-64 p-8">
+  <div class="lg:ml-64 lg:p-8 p-4">
     <h2 class="text-3xl font-bold mb-8 text-gray-800">Create New Test</h2>
 
     <UCard class="mb-8 pb-40">

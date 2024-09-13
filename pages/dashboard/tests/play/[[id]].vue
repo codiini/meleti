@@ -1,5 +1,5 @@
 <template>
-  <div class="ml-64 p-8 relative">
+  <div class="relative ml-64 lg:p-8 p-4">
     <div class="flex flex-col max-w-fit">
       <UButton
         to="/dashboard/tests"

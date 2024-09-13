@@ -1,10 +1,10 @@
 <template>
-  <div class="ml-64 p-8">
+  <div class="lg:ml-64 lg:p-8 p-4">
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-3xl font-bold text-gray-800">My Tests</h2>
     </div>
 
-    <div class="flex justify-end pt-2 pb-4">
+    <div class="flex justify-end pt-2 pb-4" v-if="tests.length > 0">
       <UButton
         size="xl"
         to="/dashboard/tests/new"
@@ -12,6 +12,27 @@
         label="Create New Test"
         class="flex items-center justify-center h-12"
       />
+    </div>
+
+    <div class="w-full" v-if="tests.length == 0 && !loading">
+      <UCard class="w-full py-4">
+        <template #header>
+          <div class="flex flex-col items-center text-center gap-y-4">
+            <h3 class="text-lg font-semibold">
+              You haven't created any tests yet
+            </h3>
+            <p>You can create a new test by clicking the button below.</p>
+
+            <UButton
+              size="xl"
+              to="/dashboard/tests/new"
+              icon="i-heroicons-plus"
+              label="Create New Test"
+              class="flex items-center justify-center h-12"
+            />
+          </div>
+        </template>
+      </UCard>
     </div>
     <!-- Test List -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -42,20 +63,6 @@
       <!-- Test Cards -->
 
       <template v-else>
-        <div v-if="tests.length == 0">
-          <UCard>
-            <template #header>
-              <div class="flex justify-between items-center">
-                <h3 class="text-lg font-semibold">No tests found</h3>
-                <UButton
-                  to="/dashboard/tests/new"
-                  label="Create New Test"
-                  color="primary"
-                />
-              </div>
-            </template>
-          </UCard>
-        </div>
         <UCard
           v-for="{
             id,

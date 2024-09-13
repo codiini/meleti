@@ -1,5 +1,5 @@
 <template>
-  <div class="ml-64 p-8">
+  <div class="lg:ml-64 lg:p-8 p-4">
     <!-- Header -->
     <header class="mb-8">
       <h1 class="text-3xl font-bold dark:text-gray-800">
@@ -12,7 +12,7 @@
     <div class="grid grid-cols-2 md:grid-cols-2 gap-6 mb-8">
       <UCard>
         <template #header>
-          <h2 class="text-lg font-semibold">Add new Course</h2>
+          <h2 class="lg:text-lg text-md font-semibold">Add new Course</h2>
         </template>
         <UButton
           to="/dashboard/courses?new=true"
@@ -23,7 +23,7 @@
       </UCard>
       <UCard>
         <template #header>
-          <h2 class="text-lg font-semibold">Create New Test</h2>
+          <h2 class="lg:text-lg text-md font-semibold">Create New Test</h2>
         </template>
         <UButton
           to="/dashboard/tests/new"
@@ -37,11 +37,13 @@
     <!-- Recent Activity -->
     <UCard class="mb-8">
       <template #header>
-        <h2 class="text-xl font-semibold">Recent Activity</h2>
+        <h2 class="lg:text-xl text-md font-semibold">Recent Activity</h2>
       </template>
       <UTable :columns="columns" :rows="rows">
         <template #empty-state>
-          <div class="flex flex-col items-center justify-center py-6 gap-3">
+          <div
+            class="flex flex-col items-center justify-center text-center py-6 gap-3"
+          >
             <h3 class="italic">Oops! No recent activity found</h3>
             <p class="text-sm">
               Start by creating a new course or adding a new test
@@ -70,7 +72,9 @@
           :testResults="testResults"
         />
         <template v-else>
-          <div class="flex flex-col items-center justify-center py-6 gap-3">
+          <div
+            class="flex flex-col items-center justify-center text-center py-6 gap-3"
+          >
             <h3 class="italic">Oops! No recent activity found</h3>
             <p class="text-sm">Start by creating and taking a test</p>
             <div class="flex gap-3">
