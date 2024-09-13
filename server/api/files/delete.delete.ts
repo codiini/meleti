@@ -5,6 +5,7 @@ export default defineEventHandler(async (event) => {
   const supabaseClient = await serverSupabaseClient(event);
 
   const fileId = getQuery(event).id as string;
+  const userId = getQuery(event).userId as string;
 
   const s3Client = new S3Client({
     endpoint: process.env.R2_ENDPOINT,
@@ -27,7 +28,8 @@ export default defineEventHandler(async (event) => {
       const { error, data } = await supabaseClient
         .from("course_files")
         .delete()
-        .eq("unique_file_name", fileId);
+        .eq("unique_file_name", fileId)
+        .eq("user_id", userId);
 
       if (error) {
         throw createError({

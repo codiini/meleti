@@ -70,7 +70,11 @@ export const useTests = () => {
 
   const deleteTest = async (testId: string) => {
     try {
-      const { error } = await supabase.from("tests").delete().eq("id", testId);
+      const { error } = await supabase
+        .from("tests")
+        .delete()
+        .eq("id", testId)
+        .eq("created_by", user.value?.id);
 
       if (error) {
         throw error;

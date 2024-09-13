@@ -129,6 +129,7 @@ import type { Question, TestInfo } from "~/types/questions";
 type TypeSelectedOption = keyof typeof userAnswers.value;
 
 const supabase = useSupabaseClient();
+const user = useSupabaseUser();
 const { saveTestResults } = useTests();
 const route = useRoute();
 
@@ -264,7 +265,8 @@ const fetchTestInfo = async () => {
   const { data, error } = await supabase
     .from("tests")
     .select("*")
-    .eq("id", route.params.id);
+    .eq("id", route.params.id)
+    .eq("created_by", user.value?.id);
 
   if (error) {
     console.error(error);

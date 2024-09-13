@@ -131,6 +131,7 @@
 
 <script setup lang="ts">
 const supabase = useSupabaseClient();
+const user = useSupabaseUser();
 const toast = useToast();
 
 const tests = ref([]);
@@ -139,7 +140,8 @@ const loading = ref(true);
 const fetchTests = async () => {
   const { data, error } = await supabase
     .from("tests")
-    .select("*, course_id(title)");
+    .select("*, course_id(title)")
+    .eq("created_by", user.value?.id);
   if (error) {
     console.error("Error fetching tests:", error);
   } else {
@@ -156,7 +158,11 @@ const deleteTest = async (id: string) => {
   tests.value = tests.value.map((test) =>
     test.id === id ? { ...test, deleting: true } : test
   );
-  const { error } = await supabase.from("tests").delete().eq("id", id);
+  const { error } = await supabase
+    .from("tests")
+    .delete()
+    .eq("id", id)
+    .eq("created_by", user.value?.id);
 
   if (error) {
     toast.add({

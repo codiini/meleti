@@ -15,7 +15,10 @@ export const useCourses = () => {
 
   const fetchCourses = async () => {
     loadingStates.fetch = true;
-    let { data, error } = await supabase.from("courses").select("*");
+    let { data, error } = await supabase
+      .from("courses")
+      .select("*")
+      .eq("user_id", user.value?.id);
     loadingStates.fetch = false;
     coursesList.value = data as Course[];
     if (error) {
@@ -31,7 +34,11 @@ export const useCourses = () => {
 
   const deleteCourse = async (id: string) => {
     loadingStates.delete = true;
-    const { error } = await supabase.from("courses").delete().eq("id", id);
+    const { error } = await supabase
+      .from("courses")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", user.value?.id);
 
     loadingStates.delete = false;
     if (error) {
@@ -63,6 +70,7 @@ export const useCourses = () => {
         description: description,
       })
       .eq("id", id)
+      .eq("user_id", user.value?.id)
       .select();
     loadingStates.save = false;
     if (error) {
@@ -115,6 +123,7 @@ export const useCourses = () => {
     const { data, error } = await supabase
       .from("course_files")
       .select(`id, unique_file_name, file_name`)
+      .eq("user_id", user.value?.id)
       .match({
         course_id: id ?? coursesList.value[0]?.id,
       });
@@ -139,6 +148,7 @@ export const useCourses = () => {
         method: "DELETE",
         params: {
           id,
+          userId: user.value?.id,
         },
       });
 

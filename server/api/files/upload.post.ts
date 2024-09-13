@@ -177,6 +177,7 @@ async function checkIfJobIsCompleted(
 
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event);
+  const userId = (await client.auth.getUser()).data.user?.id;
 
   const body = await readMultipartFormData(event);
 
@@ -266,6 +267,7 @@ export default defineEventHandler(async (event) => {
           unique_file_name: uniqueFileName,
           file_url: fileUrl,
           file_type: fileType,
+          user_id: userId,
         },
       ])
       .select();
