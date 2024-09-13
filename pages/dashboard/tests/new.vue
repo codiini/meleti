@@ -136,6 +136,10 @@ const toast = useToast();
 const supabase = useSupabaseClient();
 const user = useSupabaseUser();
 
+useHead({
+  title: "Meleti | Create New Test",
+});
+
 const generatedQuestions = ref([]);
 
 const formState = reactive({

@@ -95,6 +95,10 @@
 const user = useSupabaseUser();
 const { getTestResults } = useTests();
 
+useHead({
+  title: "Meleti | Dashboard",
+});
+
 const computedUserName = computed(() => user.value?.user_metadata.firstname);
 const testResults = ref([]);
 

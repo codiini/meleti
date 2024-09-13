@@ -3,7 +3,7 @@
     <UCard class="w-full max-w-md">
       <template #header>
         <h1 class="text-2xl font-bold text-center dark:text-gray-100">
-          Reset Your Password
+          Forgot Password
         </h1>
       </template>
       <p class="text-gray-400 mb-4">
@@ -48,6 +48,10 @@ const toast = useToast();
 
 definePageMeta({
   layout: "auth",
+});
+
+useHead({
+  title: "Meleti | Forgot Password",
 });
 
 const formState = reactive({

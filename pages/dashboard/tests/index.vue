@@ -134,6 +134,10 @@ const supabase = useSupabaseClient();
 const user = useSupabaseUser();
 const toast = useToast();
 
+useHead({
+  title: "Meleti | Tests",
+});
+
 const tests = ref([]);
 const loading = ref(true);
 

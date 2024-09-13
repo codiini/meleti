@@ -181,6 +181,10 @@
 import type { Course, CourseFile } from "@/types/courses";
 const toast = useToast();
 
+useHead({
+  title: "Meleti | Courses",
+});
+
 const showAddCourseModal = ref(false);
 const editingCourse = ref(false);
 const courseForm = reactive<Course>({
