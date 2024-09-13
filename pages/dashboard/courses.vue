@@ -43,17 +43,23 @@
       </UCard>
 
       <!-- No Courses Message -->
-      <UCard v-else class="mb-8">
-        <p class="text-center text-gray-400">
-          You haven't added any courses yet.
-        </p>
-        <UButton
-          color="primary"
-          class="mt-4 mx-auto block"
-          @click="showAddCourseModal = true"
-        >
-          Add Your First Course
-        </UButton>
+      <UCard v-else class="w-full py-4">
+        <template #header>
+          <div class="flex flex-col items-center text-center gap-y-4">
+            <h3 class="text-lg font-semibold">
+              You haven't added any courses yet.
+            </h3>
+            <p>You can add a new course by clicking the button below.</p>
+
+            <UButton
+              @click="showAddCourseModal = true"
+              size="xl"
+              icon="i-heroicons-plus"
+              label="Add Your First Course"
+              class="flex items-center justify-center h-12"
+            />
+          </div>
+        </template>
       </UCard>
     </template>
 
