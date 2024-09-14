@@ -85,7 +85,7 @@ const formState = reactive({
 });
 
 const schema = z.object({
-  email: z.string().email("Invalid email"),
+  email: z.string().email("Invalid email address"),
   password: z.string(),
 });
 

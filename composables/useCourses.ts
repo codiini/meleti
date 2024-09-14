@@ -20,7 +20,14 @@ export const useCourses = () => {
       .select("*")
       .eq("user_id", user.value?.id);
     loadingStates.fetch = false;
+    //set a deleting state on each course
     coursesList.value = data as Course[];
+
+    coursesList.value?.map((course: Course) => ({
+      ...course,
+      deleting: false,
+    }));
+
     if (error) {
       return toast.add({
         title: "Error Fetching Courses",

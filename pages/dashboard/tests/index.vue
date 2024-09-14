@@ -1,6 +1,6 @@
 <template>
   <div class="lg:ml-64 lg:p-8 p-4">
-    <div class="flex flex-col justify-between gap-y-2 items-start mb-4">
+    <div class="flex flex-col justify-between gap-y-2 items-start mb-10">
       <h2 class="text-3xl font-bold text-gray-800">Tests</h2>
       <p class="text-base text-gray-500 max-w-md">
         Manage your personal test library, where you can view, launch, and

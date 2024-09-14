@@ -7,7 +7,7 @@
           <UIcon
             size="28"
             name="i-heroicons-check-badge-20-solid"
-            class="text-green-500"
+            color="primary"
           />
         </div>
       </template>

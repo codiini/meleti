@@ -1,9 +1,10 @@
 <template>
   <div class="lg:ml-64 lg:p-8 p-4">
-    <div class="flex flex-col justify-between gap-y-2 items-start mb-6">
+    <div class="flex flex-col justify-between gap-y-2 items-start mb-10">
       <h2 class="text-3xl font-bold text-gray-800">Courses</h2>
       <p class="text-base text-gray-500 max-w-xs">
-        Explore and manage your courses, including their details and materials &#128218;
+        Explore and manage your courses, including their details and materials
+        &#128218;
       </p>
     </div>
 
@@ -40,9 +41,23 @@
         </template>
         <UTable :columns="courseColumns" :rows="coursesList">
           <template #actions-data="{ row }">
-            <UButton color="primary" variant="ghost" @click="editCourse(row)"
-              >Edit</UButton
-            >
+            <UButton
+              color="primary"
+              variant="ghost"
+              icon="i-heroicons-pencil-square"
+              @click="editCourse(row)"
+            />
+
+            <UButton
+              color="red"
+              icon="i-heroicons-trash-20-solid"
+              variant="ghost"
+              :loading="
+                coursesList.find((course: Course) => course.id === row.id)
+                  ?.deleting
+              "
+              @click="handleDelete(row.id)"
+            />
           </template>
         </UTable>
       </UCard>
@@ -120,7 +135,7 @@
                   class="flex items-center gap-x-2"
                 >
                   <UBadge
-                    color="green"
+                    color="primary"
                     variant="solid"
                     class="flex items-center space-x-2"
                     >{{ file_name }}</UBadge
@@ -185,14 +200,6 @@
             block
           >
             {{ isFileUploading ? `Uploading...` : `Save Course` }}
-          </UButton>
-          <UButton
-            v-if="editingCourse"
-            :loading="loadingStates.delete"
-            @click="handleDelete"
-            color="red"
-            block
-            >Delete Course
           </UButton>
         </form>
       </UCard>
@@ -286,9 +293,16 @@ const saveCourse = async () => {
   closeModal();
 };
 
-const handleDelete = async () => {
-  await deleteCourse(courseForm.id);
-  closeModal();
+const handleDelete = async (id: string) => {
+  //set the deleting state of the course with the id to true
+  coursesList.value = coursesList.value.map((course: Course) =>
+    course.id === id ? { ...course, deleting: true } : course
+  );
+  await deleteCourse(id);
+  //set to false
+  coursesList.value = coursesList.value.map((course: Course) =>
+    course.id === id ? { ...course, deleting: false } : course
+  );
 };
 
 const handleFileUpload = async (file: (string | Blob)[]) => {

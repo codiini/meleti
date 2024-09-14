@@ -72,26 +72,14 @@
 
           <template #footer>
             <div class="flex items-center justify-start gap-x-2">
-              <UButton
-                disabled
-                icon="i-heroicons-pencil-square"
-                color="primary"
-                variant="outline"
-              />
-
-              <UButton
-                disabled
-                icon="i-heroicons-flag"
-                color="primary"
-                variant="outline"
-              />
-
-              <UButton
-                @click="clearSelectedOption(id)"
-                icon="i-heroicons-arrow-uturn-left-solid"
-                color="primary"
-                variant="outline"
-              />
+              <UTooltip text="Flag this question">
+                <UButton
+                  disabled
+                  icon="i-heroicons-flag"
+                  color="primary"
+                  variant="outline"
+                />
+              </UTooltip>
             </div>
           </template>
         </UCard>
@@ -283,10 +271,6 @@ const fetchTestInfo = async () => {
   }
   Object.assign(testInfo, data[0]);
   testTimer.value = data[0].duration;
-};
-
-const clearSelectedOption = (id: TypeSelectedOption) => {
-  delete userAnswers.value[id];
 };
 
 const userCanLeave = ref(false);

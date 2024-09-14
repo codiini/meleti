@@ -1,14 +1,15 @@
 <template>
   <div class="lg:ml-64 lg:p-8 p-4">
     <!-- Header -->
-    <header class="mb-8">
-      <h1 class="text-3xl font-bold dark:text-gray-800">
+    <div class="mb-10">
+      <h2 class="text-3xl font-bold dark:text-gray-800">
         Welcome {{ computedUserName }}!
-      </h1>
-      <p class="dark:text-gray-600">
-        to Meleti, the only test preparation toolkit you'll ever need &#127890;
+      </h2>
+      <p class="dark:text-gray-600 max-w-sm">
+        Your comprehensive test preparation companion. Let's excel together!
+        &#127891;
       </p>
-    </header>
+    </div>
 
     <!-- Quick Actions -->
     <div class="grid grid-cols-2 md:grid-cols-2 gap-6 mb-8">
@@ -21,6 +22,7 @@
           icon="i-heroicons-plus"
           label="Add Course"
           color="primary"
+          class="lg:w-full flex items-center justify-center"
         />
       </UCard>
       <UCard>
@@ -32,6 +34,7 @@
           icon="i-heroicons-clock-solid"
           label="New Test"
           color="primary"
+          class="lg:w-full flex items-center justify-center"
         />
       </UCard>
     </div>

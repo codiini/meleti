@@ -1,6 +1,6 @@
 <template>
   <div class="lg:ml-64 lg:p-8 p-4">
-    <div class="flex flex-col justify-between gap-y-2 items-start mb-6">
+    <div class="flex flex-col justify-between gap-y-2 items-start mb-10">
       <h2 class="text-3xl font-bold text-gray-800">Create New Test</h2>
       <p class="text-base text-gray-500 max-w-md">
         Craft customized tests tailored to your course material with our
@@ -241,7 +241,6 @@ const handleTestCreation = async () => {
     toast.add({
       title: "Test created successfully",
       description: "Test created successfully, taking you to the test page...",
-      color: "green",
       callback: () => {
         navigateTo(`/dashboard/tests/play/${data.id}`);
       },
