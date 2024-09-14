@@ -5,7 +5,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     "/auth/login",
     "/auth/register",
     "/auth/forgot-password",
-    "/auth/new-password",
   ];
 
   if (to.path === "/") {
@@ -15,7 +14,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   if (
     (to.path === "/auth/new-password" ||
       to.path === "/auth/confirm" ||
-      to.path === "/auth/reset-password") &&
+      to.path === "/auth/new-password") &&
     to.query.code
   ) {
     return;
