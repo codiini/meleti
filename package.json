@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "chart.js": "^4.4.4",
+    "posthog-js": "^1.161.3",
     "vue-chartjs": "^5.3.1"
   }
 }
