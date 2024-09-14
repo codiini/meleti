@@ -1,6 +1,6 @@
 <template>
-  <div class="relative ml-64 lg:p-8 p-4">
-    <div class="flex flex-col max-w-fit">
+  <div class="relative lg:ml-64 lg:p-8 p-4">
+    <div class="flex flex-col max-w-fit my-6">
       <UButton
         to="/dashboard/tests"
         icon="i-heroicons-arrow-long-left-16-solid"
@@ -10,7 +10,7 @@
       >
         Go Back
       </UButton>
-      <div class="px-6">
+      <div class="px-6 py-3">
         <h1 class="text-3xl font-bold text-gray-800">
           {{ testInfo.title }}
         </h1>
@@ -22,9 +22,30 @@
 
     <!-- Add loading state -->
     <TestPageSkeletonLoader v-if="isLoadingQuestions" />
-    <!-- Questions List -->
-    <div v-else-if="testInfo.questions.length" class="flex justify-between">
-      <div class="flex-1 space-y-4 p-6">
+    <!-- Questions List and Timer -->
+    <div
+      v-else-if="testInfo.questions.length"
+      class="flex flex-col lg:flex-row"
+    >
+      <!-- Timer (Sticky on all screens) -->
+      <div
+        class="w-full lg:w-40 lg:order-2 lg:ml-4 mb-4 lg:mb-0 sticky top-0 z-10 bg-white lg:bg-transparent"
+      >
+        <div class="sticky top-4 z-10">
+          <div
+            class="text-2xl text-gray-900 font-bold rounded border-2 border-gray-900 p-2 w-full flex items-center justify-center"
+            :class="{
+              'bg-green-500': remainingTime > 0,
+              'bg-red-500': remainingTime <= 59,
+            }"
+          >
+            {{ formattedTime }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Questions -->
+      <div class="flex-1 lg:order-1 space-y-4">
         <UCard
           v-for="({ id, question, options }, index) in testInfo.questions"
           :key="id"
@@ -75,9 +96,11 @@
             </div>
           </template>
         </UCard>
+
+        <!-- Submit Button -->
         <div class="mt-8 flex items-center justify-center">
           <UButton
-            class="w-40 flex items-center justify-center"
+            class="w-full flex items-center justify-center sm:w-auto px-8"
             @click="submitAnswers"
             color="primary"
             size="xl"
@@ -85,18 +108,6 @@
           >
             Submit Answers
           </UButton>
-        </div>
-      </div>
-
-      <div class="sticky top-20">
-        <div
-          class="text-2xl text-gray-900 font-bold rounded border-2 border-gray-900 p-2 w-40 flex items-center justify-center"
-          :class="{
-            'bg-green-500': remainingTime > 0,
-            'bg-red-500': remainingTime <= 59,
-          }"
-        >
-          {{ formattedTime }}
         </div>
       </div>
     </div>
@@ -123,6 +134,7 @@ import type {
   RouteLocationNormalizedLoadedGeneric,
   RouteLocationNormalizedGeneric,
 } from "#vue-router";
+
 import { useTests } from "~/composables/useTests";
 import type { Question, TestInfo } from "~/types/questions";
 
