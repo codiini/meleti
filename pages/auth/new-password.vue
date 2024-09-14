@@ -1,49 +1,48 @@
 <template>
-  <div>
+  <UCard class="w-full max-w-md">
+    <template #header>
+      <h1 class="text-2xl font-bold text-center text-gray-100">
+        Set New Password
+      </h1>
+    </template>
+
     <UForm
       ref="form"
       :schema="schema"
       :state="formState"
-      class="min-h-screen flex items-center justify-center px-4"
+      @submit.prevent="handleSubmit"
+      class="space-y-4"
     >
-      <UCard class="w-full max-w-md">
-        <template #header>
-          <h1 class="text-2xl font-bold text-center text-gray-100">
-            Set New Password
-          </h1>
-        </template>
-        <form @submit.prevent="handleSubmit" class="space-y-6">
-          <UFormGroup label="New Password" name="password">
-            <UInput
-              v-model="formState.password"
-              type="password"
-              placeholder="Enter your new password"
-              autocomplete="new-password"
-            />
-          </UFormGroup>
-          <UFormGroup label="Confirm New Password" name="confirmPassword">
-            <UInput
-              v-model="formState.confirmPassword"
-              type="password"
-              placeholder="Confirm your new password"
-              autocomplete="new-password"
-            />
-          </UFormGroup>
-          <UButton type="submit" color="primary" block :loading="isLoading">
-            Reset Password
-          </UButton>
-        </form>
-        <template #footer>
-          <p class="text-center text-sm text-gray-400">
-            Remember your password?
-            <NuxtLink to="/auth/login" class="text-primary-400 hover:underline">
-              Log in
-            </NuxtLink>
-          </p>
-        </template>
-      </UCard>
+      <UFormGroup label="New Password" name="password">
+        <UInput
+          v-model="formState.password"
+          type="password"
+          placeholder="Enter your new password"
+          autocomplete="new-password"
+        />
+      </UFormGroup>
+      <UFormGroup label="Confirm New Password" name="confirmPassword">
+        <UInput
+          v-model="formState.confirmPassword"
+          type="password"
+          placeholder="Confirm your new password"
+          autocomplete="new-password"
+        />
+      </UFormGroup>
+      <UButton type="submit" color="primary" block :loading="isLoading">
+        Reset Password
+      </UButton>
     </UForm>
-  </div>
+
+    <template #footer>
+      <p class="text-center text-sm text-gray-400">
+        Remember your password?
+        <NuxtLink to="/auth/login" class="text-primary-400 hover:underline">
+          Log in
+        </NuxtLink>
+      </p>
+    </template>
+  </UCard>
 </template>
 
 <script setup lang="ts">

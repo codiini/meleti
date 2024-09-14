@@ -1,43 +1,40 @@
 <template>
-  <div class="bg-gray-100 flex items-center justify-center">
-    <UCard class="w-full max-w-md">
-      <template #header>
-        <h1 class="text-2xl font-bold text-center dark:text-gray-100">
-          Forgot Password
-        </h1>
-      </template>
-      <p class="text-gray-400 mb-4">
-        Enter your email address and we'll send you a link to reset your
-        password.
-      </p>
-      <UForm
-        ref="form"
-        :schema="schema"
-        :state="formState"
-        @submit.prevent="handleResetPassword"
-        class="space-y-4"
+  <UCard class="w-full max-w-md">
+    <template #header>
+      <h1 class="text-2xl font-bold text-center dark:text-gray-100">
+        Forgot Password
+      </h1>
+    </template>
+    <p class="text-gray-400 mb-4">
+      Enter your email address and we'll send you a link to reset your password.
+    </p>
+    <UForm
+      ref="form"
+      :schema="schema"
+      :state="formState"
+      @submit.prevent="handleResetPassword"
+      class="space-y-4"
+    >
+      <UFormGroup label="Email" name="email">
+        <UInput
+          v-model="formState.email"
+          type="email"
+          placeholder="your@email.com"
+        />
+      </UFormGroup>
+      <UButton type="submit" color="primary" :loading="isLoading" block
+        >Send Reset Link</UButton
       >
-        <UFormGroup label="Email" name="email">
-          <UInput
-            v-model="formState.email"
-            type="email"
-            placeholder="your@email.com"
-          />
-        </UFormGroup>
-        <UButton type="submit" color="primary" :loading="isLoading" block
-          >Send Reset Link</UButton
+    </UForm>
+    <template #footer>
+      <p class="text-center text-sm text-gray-600">
+        Remember your password?
+        <NuxtLink to="/auth/login" class="text-primary-600 hover:underline"
+          >Log in</NuxtLink
         >
-      </UForm>
-      <template #footer>
-        <p class="text-center text-sm text-gray-600">
-          Remember your password?
-          <NuxtLink to="/auth/login" class="text-primary-600 hover:underline"
-            >Log in</NuxtLink
-          >
-        </p>
-      </template>
-    </UCard>
-  </div>
+      </p>
+    </template>
+  </UCard>
 </template>
 
 <script setup lang="ts">

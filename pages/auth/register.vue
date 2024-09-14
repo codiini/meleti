@@ -1,58 +1,54 @@
 <template>
-  <div>
+  <UCard class="w-full max-w-md">
+    <template #header>
+      <h1 class="text-2xl font-bold text-center dark:text-gray-100">
+        Create your Account
+      </h1>
+    </template>
     <UForm
       ref="form"
       :schema="schema"
       :state="formState"
-      class="space-y-4 w-full flex items-center justify-center"
-      @submit="handleRegister"
+      class="space-y-4"
+      @submit.prevent="handleRegister"
     >
-      <UCard class="w-full max-w-md">
-        <template #header>
-          <h1 class="text-2xl font-bold text-center dark:text-gray-100">
-            Create your Account
-          </h1>
-        </template>
-        <form @submit.prevent="handleRegister" class="space-y-4">
-          <UFormGroup label="Full Name" name="fullName">
-            <UInput v-model="formState.fullName" placeholder="John Doe" />
-          </UFormGroup>
-          <UFormGroup label="Email" name="email">
-            <UInput
-              v-model="formState.email"
-              type="email"
-              placeholder="your@email.com"
-            />
-          </UFormGroup>
-          <UFormGroup label="Password" name="password">
-            <UInput
-              v-model="formState.password"
-              type="password"
-              placeholder="••••••••"
-            />
-          </UFormGroup>
-          <UFormGroup label="Confirm Password" name="confirmPassword">
-            <UInput
-              v-model="formState.confirmPassword"
-              type="password"
-              placeholder="••••••••"
-            />
-          </UFormGroup>
-          <UButton type="submit" color="primary" :loading="isLoading" block
-            >Register</UButton
-          >
-        </form>
-        <template #footer>
-          <p class="text-center text-sm text-gray-600">
-            Already have an account?
-            <NuxtLink to="/auth/login" class="text-primary-600 hover:underline"
-              >Log in</NuxtLink
-            >
-          </p>
-        </template>
-      </UCard>
+      <UFormGroup label="Full Name" name="fullName">
+        <UInput v-model="formState.fullName" placeholder="John Doe" />
+      </UFormGroup>
+      <UFormGroup label="Email" name="email">
+        <UInput
+          v-model="formState.email"
+          type="email"
+          placeholder="your@email.com"
+        />
+      </UFormGroup>
+      <UFormGroup label="Password" name="password">
+        <UInput
+          v-model="formState.password"
+          type="password"
+          placeholder="••••••••"
+        />
+      </UFormGroup>
+      <UFormGroup label="Confirm Password" name="confirmPassword">
+        <UInput
+          v-model="formState.confirmPassword"
+          type="password"
+          placeholder="••••••••"
+        />
+      </UFormGroup>
+      <UButton type="submit" color="primary" :loading="isLoading" block
+        >Register</UButton
+      >
     </UForm>
-  </div>
+    <template #footer>
+      <p class="text-center text-sm text-gray-600">
+        Already have an account?
+        <NuxtLink to="/auth/login" class="text-primary-600 hover:underline"
+          >Log in</NuxtLink
+        >
+      </p>
+    </template>
+  </UCard>
 </template>
 
 <script setup lang="ts">
