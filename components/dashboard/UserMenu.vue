@@ -36,6 +36,7 @@ const items = [
     {
       label: "Profile",
       icon: "i-heroicons-user-circle-20-solid",
+      to: "/dashboard/profile",
     },
     {
       label: "Logout",
