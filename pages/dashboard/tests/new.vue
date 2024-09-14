@@ -6,7 +6,13 @@
       <template #header>
         <h2 class="text-xl font-semibold">Create New Test</h2>
       </template>
-      <form @submit.prevent="handleTestCreation" class="space-y-6">
+      <UForm
+        ref="form"
+        :schema="schema"
+        :state="formState"
+        @submit.prevent="handleTestCreation"
+        class="space-y-6"
+      >
         <div class="grid grid-cols-2 gap-y-10 gap-x-6">
           <UFormGroup label="Title" name="title">
             <UInput
@@ -15,7 +21,7 @@
               placeholder="Eg: Calculus Practice"
             />
           </UFormGroup>
-          <UFormGroup label="Choose Course" name="title">
+          <UFormGroup label="Choose Course" name="selectedCourse">
             <USelect
               @change="fetchCourseFiles"
               :loading="loadingStates.courseFileDetails"
@@ -72,7 +78,7 @@
             />
           </UFormGroup>
 
-          <UFormGroup label="Course Files">
+          <UFormGroup label="Course Files" name="selectedFile">
             <div
               v-if="
                 formState.selectedCourse && formState.courseFiles.length > 0
@@ -106,7 +112,6 @@
           color="primary"
           size="xl"
           class="w-full h-16 text-center flex items-center justify-center"
-          :disabled="!formState.selectedCourse"
         >
           Generate Test
           <svg
@@ -125,12 +130,13 @@
             />
           </svg>
         </UButton>
-      </form>
+      </UForm>
     </UCard>
   </div>
 </template>
 
 <script setup lang="ts">
+import { z } from "zod";
 const { fetchCourses, coursesList } = useCourses();
 const toast = useToast();
 const supabase = useSupabaseClient();
@@ -139,7 +145,19 @@ useHead({
   title: "Meleti | Create New Test",
 });
 
+const form = ref();
 const generatedQuestions = ref([]);
+
+const schema = z.object({
+  title: z.string().min(1, "Title is required"),
+  difficulty: z.string().min(1, "Difficulty is required"),
+  maxQuestions: z.number().min(1, "Max questions is required"),
+  testType: z.string().min(1, "Test type is required"),
+  selectedCourse: z.string().min(1, "Course is required"),
+  selectedFile: z.string().min(1, "File is required"),
+  duration: z.number().min(1, "Duration is required"),
+  // description: z.string().min(1, "Description is required"),
+});
 
 const formState = reactive({
   title: "",
@@ -192,6 +210,7 @@ const difficultyOptions = [
 ];
 
 const handleTestCreation = async () => {
+  form.value.validate();
   loadingStates.testCreation = true;
 
   try {
