@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { Line } from "vue-chartjs";
+import ChartLegend from "./ChartLegend.vue";
 
 const props = defineProps<{
   testResults: any; // TODO: Define a type for test results
@@ -22,34 +23,50 @@ const chartOptions = ref({
       tension: 5,
     },
   },
-  legend: {
-    labels: {
-      usePointStyle: true,
-      pointStyle: "circle",
-      pointRadius: 8,
-      pointBorderWidth: 2,
-      font: {
-        size: 16,
-      },
-    },
-  },
   scales: {
     y: {
       beginAtZero: true,
       title: {
+        font: {
+          family: "Inter",
+          size: 13,
+        },
         display: true,
         text: "Score (%)",
       },
     },
     x: {
       title: {
+        font: {
+          family: "Inter",
+          size: 13,
+        },
         display: true,
         text: "Test Date",
       },
     },
   },
+  layout: {
+    padding: {
+      left: 10,
+      right: 10,
+      top: 10,
+      bottom: 10,
+    },
+  },
   plugins: {
+    htmlLegend: {
+      containerID: "legend-container",
+    },
+    legend: {
+      display: false,
+    },
+
     title: {
+      font: {
+        size: 13,
+        family: "Inter",
+      },
       display: true,
       text: "Performance Over Time",
     },
@@ -91,5 +108,8 @@ onBeforeMount(async () => {
 });
 </script>
 <template>
+  <div class="absolute -top-6 left-0">
+    <ChartLegend :legendValues="chartData.datasets" />
+  </div>
   <Line :data="chartData" :options="chartOptions" />
 </template>
