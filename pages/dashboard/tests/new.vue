@@ -161,7 +161,7 @@ const schema = z.object({
   testType: z.string().min(1, "Test type is required"),
   selectedCourse: z.string().min(1, "Course is required"),
   selectedFile: z.string().min(1, "File is required"),
-  duration: z.number().min(1, "Duration is required"),
+  duration: z.string().min(1, "Duration is required"),
   // description: z.string().min(1, "Description is required"),
 });
 
@@ -173,7 +173,7 @@ const formState = reactive({
   courseFiles: [],
   selectedCourse: "",
   selectedFile: "",
-  duration: 1800,
+  duration: "900",
   description: "",
 });
 
@@ -201,6 +201,8 @@ const testTypeOptions = [
 ];
 
 const durationOptions = [
+  { value: 300, label: "5 minutes" },
+  { value: 600, label: "10 minutes" },
   { value: 900, label: "15 minutes" },
   { value: 1800, label: "30 minutes" },
   { value: 2700, label: "45 minutes" },

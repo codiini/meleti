@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 dark:text-gray-900">
+  <div class="p-6 dark:text-gray-900 z-20">
     <div class="flex justify-between items-center mb-8">
       <UDropdown :items="items" :popper="{ placement: 'bottom-start' }">
         <UButton color="black" variant="outline">

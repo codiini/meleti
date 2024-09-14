@@ -35,8 +35,7 @@
           <div
             class="text-2xl text-gray-900 font-bold rounded border-2 border-gray-900 p-2 w-full flex items-center justify-center"
             :class="{
-              'bg-green-500': remainingTime > 0,
-              'bg-red-500': remainingTime <= 59,
+              'bg-red-500': testTimer <= 119,
             }"
           >
             {{ formattedTime }}
@@ -165,7 +164,6 @@ const showResults = ref(false);
 const isQuizCompleted = ref(false);
 
 const userAnswers = ref({});
-const remainingTime = ref();
 const isLeaveTestModalOpen = ref(false);
 
 const formattedTime = computed(() => {
