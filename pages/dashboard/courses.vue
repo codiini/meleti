@@ -143,13 +143,25 @@
           </UFormGroup>
           <UFormGroup label="Upload Study Materials" name="courseMaterials">
             <template #help>
-              <p
-                v-if="courseForm.materials?.length == 2"
-                class="flex items-center gap-x-1"
-              >
-                <UIcon name="i-heroicons-exclamation-circle" class="w-5 h-5" />
-                You can only add 2 materials to a course.
-              </p>
+              <div class="flex flex-col gap-y-1">
+                <div class="flex items-center gap-x-1">
+                  <UIcon
+                    name="i-heroicons-exclamation-circle"
+                    class="w-5 h-5"
+                  />
+                  Max. file upload size of 4mb
+                </div>
+                <div
+                  v-if="courseForm.materials?.length == 2"
+                  class="flex items-center gap-x-1"
+                >
+                  <UIcon
+                    name="i-heroicons-exclamation-circle"
+                    class="w-5 h-5"
+                  />
+                  You can only add 2 materials to a course.
+                </div>
+              </div>
             </template>
             <UInput
               :disabled="isFileUploading || courseForm.materials?.length == 2"
@@ -300,10 +312,12 @@ const handleFileUpload = async (file: (string | Blob)[]) => {
         icon: "i-heroicons-check-circle",
       });
     }
-  } catch (e) {
+  } catch (e: any) {
     toast.add({
       title: "Upload Failed",
-      description: "There was an error uploading your file. Please try again.",
+      description:
+        e.statusMessage ||
+        "There was an error uploading your file. Please try again.",
       icon: "i-heroicons-exclamation-circle",
       color: "red",
     });
