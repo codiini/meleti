@@ -7,6 +7,12 @@ const API_KEY = process.env.PDF_CO_API_KEY as string;
 
 type ConvertPdfToTextResponse = {
   url: string;
+  jobId: string;
+  outputLinkValidTill: string;
+  credits: number;
+  remainingCredits: number;
+  jobDuration: number;
+  duration: number;
   status: "success" | "working" | "error";
 };
 
@@ -103,17 +109,16 @@ async function convertPdfToText(
       rawData += chunk;
     }
 
-    const data = JSON.parse(rawData);
+    const data = JSON.parse(rawData) as ConvertPdfToTextResponse;
 
-    if (data.error === false) {
+    if (data.url) {
       const result = await checkIfJobIsCompleted(
         data.jobId,
-        data.resultFileUrl,
+        data.url,
         destinationFile
       );
-      return result as ConvertPdfToTextResponse;
-    }
-    return undefined;
+      return result;
+    } else return undefined;
   } catch (error) {
     console.error("convertPdfToText(): " + error);
   }
@@ -163,7 +168,7 @@ async function checkIfJobIsCompleted(
 
     if (data.status === "working") {
       await new Promise((resolve) => setTimeout(resolve, 5000));
-      await checkIfJobIsCompleted(jobId, resultFileUrl, destinationFile);
+      return await checkIfJobIsCompleted(jobId, resultFileUrl, destinationFile);
     } else if (data.status === "success") {
       return data;
     } else {
@@ -216,7 +221,7 @@ export default defineEventHandler(async (event) => {
     await uploadFile(fileData, uploadUrl);
 
     // 3. CONVERT UPLOADED PDF FILE TO TEXT
-    const { url } = await convertPdfToText(
+    const result = await convertPdfToText(
       API_KEY,
       uploadedFileUrl,
       "",
@@ -224,14 +229,14 @@ export default defineEventHandler(async (event) => {
       fileName
     );
 
-    if (!url) {
+    if (!result?.url) {
       throw createError({
         statusCode: 500,
         statusMessage: "Failed to convert PDF to text. Please try again later.",
       });
     }
 
-    const textContent: string = await $fetch(url);
+    const textContent: string = await $fetch(result.url);
 
     const uploadData = await $fetch("/api/files/get-signed-url", {
       method: "PUT",
