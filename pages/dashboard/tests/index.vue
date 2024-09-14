@@ -1,16 +1,20 @@
 <template>
   <div class="lg:ml-64 lg:p-8 p-4">
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-3xl font-bold text-gray-800">My Tests</h2>
+    <div class="flex flex-col justify-between gap-y-2 items-start mb-4">
+      <h2 class="text-3xl font-bold text-gray-800">Tests</h2>
+      <p class="text-base text-gray-500 max-w-md">
+        Manage your personal test library, where you can view, launch, and
+        organize all your created tests at a glance &#129299;
+      </p>
     </div>
 
-    <div class="flex justify-end pt-2 pb-4" v-if="tests.length > 0">
+    <div class="flex justify-end pb-4" v-if="tests.length > 0">
       <UButton
         size="xl"
         to="/dashboard/tests/new"
         icon="i-heroicons-plus"
         label="Create New Test"
-        class="flex items-center justify-center h-12"
+        class="flex items-center justify-center h-12 w-full lg:w-auto"
       />
     </div>
 

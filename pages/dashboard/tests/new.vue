@@ -1,6 +1,12 @@
 <template>
   <div class="lg:ml-64 lg:p-8 p-4">
-    <h2 class="text-3xl font-bold mb-8 text-gray-800">Create New Test</h2>
+    <div class="flex flex-col justify-between gap-y-2 items-start mb-6">
+      <h2 class="text-3xl font-bold text-gray-800">Create New Test</h2>
+      <p class="text-base text-gray-500 max-w-md">
+        Craft customized tests tailored to your course material with our
+        intuitive, AI-powered test generation tool &#128640;
+      </p>
+    </div>
 
     <UCard class="mb-8 pb-40">
       <template #header>

@@ -41,18 +41,18 @@
               {{ user.user_metadata.firstname }}
               {{ user.user_metadata.surname }}
             </h1>
-            <p class="text-gray-500">{{ user.email }}</p>
+            <p class="text-gray-500 text-sm lg:text-lg">{{ user.email }}</p>
           </div>
         </div>
       </template>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:gap-4 gap-10">
         <div>
           <h2 class="text-lg font-semibold mb-2">About</h2>
           <p>{{ user.about ? user.about : "No bio set" }}</p>
         </div>
         <div>
           <h2 class="text-lg font-semibold mb-2">Stats</h2>
-          <ul>
+          <ul class="space-y-3">
             <li>Tests Created: {{ userStats.testsCreated }}</li>
             <li>Average Score: {{ userStats.averageScore }}%</li>
             <li>Courses Created: {{ userStats.coursesCreated }}</li>

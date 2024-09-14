@@ -1,6 +1,11 @@
 <template>
   <div class="lg:ml-64 lg:p-8 p-4">
-    <h1 class="text-3xl font-bold mb-8 text-gray-800">Course Management</h1>
+    <div class="flex flex-col justify-between gap-y-2 items-start mb-6">
+      <h2 class="text-3xl font-bold text-gray-800">Courses</h2>
+      <p class="text-base text-gray-500 max-w-xs">
+        Explore and manage your courses, including their details and materials &#128218;
+      </p>
+    </div>
 
     <template v-if="loadingStates.fetch">
       <!-- Skeleton Loader -->

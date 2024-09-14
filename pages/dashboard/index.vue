@@ -5,7 +5,9 @@
       <h1 class="text-3xl font-bold dark:text-gray-800">
         Welcome {{ computedUserName }}!
       </h1>
-      <p class="dark:text-gray-600">Your AI-powered exam preparation toolkit</p>
+      <p class="dark:text-gray-600">
+        to Meleti, the only test preparation toolkit you'll ever need &#127890;
+      </p>
     </header>
 
     <!-- Quick Actions -->
@@ -66,7 +68,7 @@
         <h2 class="text-xl font-semibold">Performance Overview</h2>
       </template>
       <!-- Add a chart component here -->
-      <div class="h-64 flex items-center justify-center">
+      <div class="h-64 flex items-center justify-center relative">
         <DashboardPerformanceChart
           v-if="testResults.length > 0"
           :testResults="testResults"
