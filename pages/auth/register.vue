@@ -6,15 +6,22 @@
       </h1>
     </template>
     <UForm
-      ref="form"
+      ref="formRef"
       :schema="schema"
       :state="formState"
       class="space-y-4"
       @submit.prevent="handleRegister"
     >
       <UFormGroup label="Full Name" name="fullName">
+        <template #help>
+          <div class="flex items-center gap-x-1 text-xs text-gray-300">
+            <UIcon name="i-heroicons-information-circle" class="w-4 h-4" />
+            Enter your first name and surname separated by a space.
+          </div>
+        </template>
         <UInput v-model="formState.fullName" placeholder="John Doe" />
       </UFormGroup>
+
       <UFormGroup label="Email" name="email">
         <UInput
           v-model="formState.email"
@@ -22,20 +29,25 @@
           placeholder="your@email.com"
         />
       </UFormGroup>
+
       <UFormGroup label="Password" name="password">
-        <UInput
-          v-model="formState.password"
-          type="password"
-          placeholder="••••••••"
-        />
+        <div class="relative">
+          <UInput
+            v-model="formState.password"
+            :type="showPassword ? 'text' : 'password'"
+            placeholder="••••••••"
+          />
+          <UButton
+            :icon="showPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
+            variant="ghost"
+            color="gray"
+            size="xs"
+            class="absolute right-2 top-1/2 -translate-y-1/2"
+            @click="showPassword = !showPassword"
+          />
+        </div>
       </UFormGroup>
-      <UFormGroup label="Confirm Password" name="confirmPassword">
-        <UInput
-          v-model="formState.confirmPassword"
-          type="password"
-          placeholder="••••••••"
-        />
-      </UFormGroup>
+
       <UButton type="submit" color="primary" :loading="isLoading" block
         >Register</UButton
       >
@@ -69,13 +81,21 @@ const formState = reactive({
   fullName: "",
   email: "",
   password: "",
-  confirmPassword: "",
 });
 
-const form = ref(null);
+const formRef = ref(null);
+const showPassword = ref(false);
 
 const schema = z.object({
-  email: z.string().email("Invalid email"),
+  fullName: z
+    .string()
+    .min(1, "Full name is required")
+    .refine(
+      (value: string) => value.trim().includes(" "),
+      "Please enter both first and last name separated by a space"
+    ),
+
+  email: z.string().email("Invalid email address"),
   password: z
     .string()
     .min(8, "Must be at least 8 characters")
@@ -83,19 +103,19 @@ const schema = z.object({
       formState.password = value;
       return true;
     }),
-  confirmPassword: z
-    .string()
-    .min(8, "Re-enter your password to confirm it")
-    .refine(
-      (value: string) => value === formState.password,
-      "Passwords do not match"
-    ),
+  // confirmPassword: z
+  //   .string()
+  //   .min(8, "Re-enter your password to confirm it")
+  //   .refine(
+  //     (value: string) => value === formState.password,
+  //     "Passwords do not match"
+  //   ),
 });
 
 const isLoading = ref(false);
 
 const handleRegister = async () => {
-  form.value.validate();
+  formRef.value.validate();
   isLoading.value = true;
   const { error } = await supabase.auth.signUp({
     password: formState.password,
@@ -127,9 +147,10 @@ const handleRegister = async () => {
 };
 
 const clearForm = () => {
-  formState.fullName = "";
-  formState.email = "";
-  formState.password = "";
-  formState.confirmPassword = "";
+  Object.assign(formState, {
+    fullName: "",
+    email: "",
+    password: "",
+  });
 };
 </script>
