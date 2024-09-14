@@ -296,6 +296,13 @@ export default defineEventHandler(async (event) => {
       data: materialData[0],
     };
   } catch (error: any) {
+    if (error.status === 413) {
+      throw createError({
+        statusCode: 413,
+        statusMessage:
+          "File size is too large. Please try again with a smaller file.",
+      });
+    }
     throw createError({
       statusCode: 500,
       statusMessage: error.message,
