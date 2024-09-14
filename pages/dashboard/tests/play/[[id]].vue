@@ -273,10 +273,16 @@ const fetchTestInfo = async () => {
   testTimer.value = data[0].duration;
 };
 
+const intendedRoute = ref("");
+
 const userCanLeave = ref(false);
 const leaveTest = () => {
   userCanLeave.value = true;
-  navigateTo("/dashboard/tests");
+  if (intendedRoute.value) {
+    navigateTo(intendedRoute.value);
+  } else {
+    navigateTo("/dashboard/tests");
+  }
 };
 
 onBeforeRouteLeave(
@@ -291,6 +297,7 @@ onBeforeRouteLeave(
       !userCanLeave.value &&
       !isQuizCompleted.value
     ) {
+      intendedRoute.value = to.fullPath;
       isLeaveTestModalOpen.value = true;
       return false;
     }
