@@ -115,7 +115,8 @@ const fetchUserStats = async () => {
     .eq("user_id", user.value?.id);
 
   userStats.averageScore =
-    testResults.reduce((acc, curr) => acc + curr.score, 0) / testResults.length;
+    testResults.reduce((acc, curr) => acc + curr.score, 0) /
+      testResults.length || 0;
 };
 
 onMounted(async () => {

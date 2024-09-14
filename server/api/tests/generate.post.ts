@@ -8,9 +8,9 @@ const cleanOutput = (output: string) => {
 };
 
 export default defineEventHandler(async (event) => {
+  const supabaseClient = await serverSupabaseClient(event);
   const body = await readBody(event);
-  const userId = (await serverSupabaseClient(event).auth.getUser()).data.user
-    ?.id;
+  const userId = (await supabaseClient.auth.getUser()).data.user?.id;
 
   if (!userId) {
     throw createError({
@@ -29,8 +29,6 @@ export default defineEventHandler(async (event) => {
     duration,
     description,
   } = body;
-
-  const supabaseClient = await serverSupabaseClient(event);
 
   try {
     const { content } = await $fetch("/api/files/retrieve-download", {

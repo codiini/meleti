@@ -13,6 +13,26 @@ const chartData = reactive({
 const chartOptions = ref({
   responsive: true,
   maintainAspectRatio: false,
+  elements: {
+    point: {
+      radius: 7,
+      borderWidth: 2,
+    },
+    line: {
+      tension: 5,
+    },
+  },
+  legend: {
+    labels: {
+      usePointStyle: true,
+      pointStyle: "circle",
+      pointRadius: 8,
+      pointBorderWidth: 2,
+      font: {
+        size: 16,
+      },
+    },
+  },
   scales: {
     y: {
       beginAtZero: true,
