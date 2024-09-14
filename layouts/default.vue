@@ -7,7 +7,7 @@
           @click="toggleSidebar"
           :icon="isSidebarOpen ? 'i-heroicons-x-mark' : 'i-heroicons-bars-3'"
           variant="ghost"
-          size="xl"
+          size="md"
           class="text-black lg:hidden absolute top-6 left-2 z-[55] transition-all duration-300"
           :class="isSidebarOpen ? 'translate-x-64' : 'translate-x-0'"
         />
@@ -21,19 +21,28 @@
 <script setup>
 import UserMenu from "@/components/dashboard/UserMenu.vue";
 
-const isSidebarOpen = ref(true);
+const isSidebarOpen = ref(false);
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
 };
 
 const closeSidebar = () => {
-  isSidebarOpen.value = false;
-};
-
-onMounted(() => {
   if (window.innerWidth < 1024) {
     isSidebarOpen.value = false;
   }
+};
+
+onMounted(() => {
+  isSidebarOpen.value = window.innerWidth >= 1024;
+  window.addEventListener('resize', () => {
+    isSidebarOpen.value = window.innerWidth >= 1024;
+  });
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', () => {
+    isSidebarOpen.value = window.innerWidth >= 1024;
+  });
 });
 </script>
