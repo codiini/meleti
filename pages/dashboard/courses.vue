@@ -184,7 +184,7 @@
               </div>
             </template>
             <UInput
-              @change="setBlob($event)"
+              @change="setBlob($event[0])"
               :disabled="isFileUploading || courseForm.materials?.length == 2"
               type="file"
               accept=".pdf"
@@ -286,9 +286,8 @@ const saveCourse = async () => {
   }
 
   if (editingCourse.value) {
-    if (fileInput.value && fileInput.value?.length > 0) {
-      const file = fileInput.value[0];
-      await handleFileUpload(file);
+    if (fileInput.value) {
+      await handleFileUpload(fileInput.value);
     }
     await updateCourse(courseForm.id, courseForm.title, courseForm.description);
   } else {
@@ -297,18 +296,18 @@ const saveCourse = async () => {
       courseForm.description
     );
     courseForm.id = newCourse?.id as string;
-  }
-  if (fileInput.value && fileInput.value?.length > 0) {
-    const file = fileInput.value[0];
-    toast.add({
-      title: "Uploading...",
-      description: "Please wait while your file is being uploaded.",
-      icon: "i-heroicons-check-circle",
-    });
-    await handleFileUpload(file);
+
+    if (fileInput.value) {
+      toast.add({
+        title: "Uploading...",
+        description: "Please wait while your file is being uploaded.",
+        icon: "i-heroicons-check-circle",
+      });
+      await handleFileUpload(fileInput.value);
+    }
   }
 
-  fetchCourses();
+  await fetchCourses();
   closeModal();
 };
 
