@@ -126,7 +126,7 @@ export const useCourses = () => {
       return null;
     }
     toast.add({
-      title: "Course Added Successfully!",
+      title: "Course Created Successfully!",
       icon: "i-heroicons-check-badge-solid",
     });
     return data[0];

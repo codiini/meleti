@@ -288,11 +288,6 @@ const saveCourse = async () => {
   if (editingCourse.value) {
     if (fileInput.value && fileInput.value?.length > 0) {
       const file = fileInput.value[0];
-      toast.add({
-        title: "Uploading...",
-        description: "Please wait while your file is being uploaded.",
-        icon: "i-heroicons-check-circle",
-      });
       await handleFileUpload(file);
     }
     await updateCourse(courseForm.id, courseForm.title, courseForm.description);
@@ -305,6 +300,11 @@ const saveCourse = async () => {
   }
   if (fileInput.value && fileInput.value?.length > 0) {
     const file = fileInput.value[0];
+    toast.add({
+      title: "Uploading...",
+      description: "Please wait while your file is being uploaded.",
+      icon: "i-heroicons-check-circle",
+    });
     await handleFileUpload(file);
   }
 
