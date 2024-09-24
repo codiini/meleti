@@ -246,6 +246,8 @@ export default defineEventHandler(async (event) => {
       },
     });
 
+    console.log("Upload Data:", uploadData);
+
     const {
       signedUrl,
       fileName: supabaseFileName,
@@ -263,6 +265,7 @@ export default defineEventHandler(async (event) => {
         },
       });
     } catch (error: any) {
+      console.log("Signed URL:", error);
       throw createError({
         statusCode: 500,
         statusMessage: error.message,
@@ -285,6 +288,7 @@ export default defineEventHandler(async (event) => {
       .select();
 
     if (error) {
+      console.log("Supabase Error:", error);
       throw createError({
         statusCode: 500,
         statusMessage: error.message,
