@@ -184,8 +184,8 @@
               </div>
             </template>
             <UInput
+              @change="setBlob($event)"
               :disabled="isFileUploading || courseForm.materials?.length == 2"
-              @change="handleFileUpload($event)"
               type="file"
               accept=".pdf"
               icon="i-heroicons-folder"
@@ -217,6 +217,7 @@ useHead({
 
 const showAddCourseModal = ref(false);
 const editingCourse = ref(false);
+const fileInput = ref();
 const courseForm = reactive<Course>({
   id: "",
   title: "",
@@ -285,10 +286,28 @@ const saveCourse = async () => {
   }
 
   if (editingCourse.value) {
+    if (fileInput.value && fileInput.value?.length > 0) {
+      const file = fileInput.value[0];
+      toast.add({
+        title: "Uploading...",
+        description: "Please wait while your file is being uploaded.",
+        icon: "i-heroicons-check-circle",
+      });
+      await handleFileUpload(file);
+    }
     await updateCourse(courseForm.id, courseForm.title, courseForm.description);
   } else {
-    await createCourse(courseForm.title, courseForm.description);
+    const newCourse = await createCourse(
+      courseForm.title,
+      courseForm.description
+    );
+    courseForm.id = newCourse?.id as string;
   }
+  if (fileInput.value && fileInput.value?.length > 0) {
+    const file = fileInput.value[0];
+    await handleFileUpload(file);
+  }
+
   fetchCourses();
   closeModal();
 };
@@ -300,16 +319,18 @@ const handleDelete = async (id: string) => {
   );
   await deleteCourse(id);
   //set to false
-  coursesList.value = coursesList.value.map((course: Course) =>
-    course.id === id ? { ...course, deleting: false } : course
-  );
+  fetchCourses();
 };
 
-const handleFileUpload = async (file: (string | Blob)[]) => {
+const setBlob = (file: Blob) => {
+  fileInput.value = file;
+};
+
+const handleFileUpload = async (file: File) => {
   isFileUploading.value = true;
 
   const formData = new FormData();
-  formData.append("file", file[0]);
+  formData.append("file", file);
 
   try {
     const { statusCode }: { statusCode: number } = await $fetch(
