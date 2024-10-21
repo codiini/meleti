@@ -265,7 +265,7 @@ export default defineEventHandler(async (event) => {
         },
       });
     } catch (error: any) {
-      console.log("Signed URL:", error);
+      console.error("Signed URL:", error);
       throw createError({
         statusCode: 500,
         statusMessage: error.message,

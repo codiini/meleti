@@ -1,40 +1,35 @@
-import { S3, GetObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { AwsClient } from "aws4fetch";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const { fileName } = body;
 
-  const s3Client = new S3({
+  const s3Client = new AwsClient({
+    service: "s3",
     region: "auto",
-    endpoint: process.env.R2_ENDPOINT,
-    signatureVersion: "v4",
-    version: "2024-01-01",
-    credentials: {
-      accessKeyId: process.env.R2_ACCESS_KEY_ID,
-      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
-    },
+    accessKeyId: process.env.R2_ACCESS_KEY_ID as string,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY as string,
   });
 
-  const command = new GetObjectCommand({
-    Bucket: process.env.R2_BUCKET_NAME,
-    Key: fileName,
-  });
+  const url = new URL(
+    `https://${process.env.R2_BUCKET_NAME}.${
+      process.env.CLOUDFLARE_ACCOUNT_ID
+    }.r2.cloudflarestorage.com`
+  );
+  url.pathname = fileName;
+  url.searchParams.set("X-Amz-Expires", "3600");
 
   try {
-    event.node.res.setHeader(
-      "Access-Control-Allow-Origin",
-      "http://localhost:3000"
-    );
-    event.node.res.setHeader("Access-Control-Allow-Methods", "GET, PUT, POST");
-    event.node.res.setHeader("Access-Control-Allow-Headers", "*");
-    const signedUrl = await getSignedUrl(s3Client, command, {
-      expiresIn: 3600,
-    });
-
+    const response = await s3Client
+      .sign(new Request(url, { method: "GET" }), {
+        aws: {
+          signQuery: true,
+        },
+      })
+     
     return {
       statusCode: 200,
-      data: signedUrl,
+      data: response.url,
     };
   } catch (error) {
     console.error("Error generating signed URL:", error);

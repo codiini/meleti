@@ -84,7 +84,7 @@ export default defineEventHandler(async (event) => {
       data: data[0],
     };
   } catch (error: any) {
-    console.log("error: ", error);
+    console.error("error: ", error);
     throw createError({
       statusCode: 500,
       statusMessage: error.message || "Error generating test questions",
