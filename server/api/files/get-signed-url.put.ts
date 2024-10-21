@@ -1,5 +1,4 @@
-import { S3, PutObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { AwsClient } from "aws4fetch";
 import { randomUUID } from "crypto";
 
 export default defineEventHandler(async (event) => {
@@ -8,35 +7,30 @@ export default defineEventHandler(async (event) => {
 
   const uniqueFileName = `${randomUUID()}-${fileName}`;
 
-  const s3Client = new S3({
+  const s3Client = new AwsClient({
+    service: "s3",
     region: "auto",
-    endpoint: process.env.R2_ENDPOINT,
-    signatureVersion: "v4",
-    version: "2024-01-01",
-    credentials: {
-      accessKeyId: process.env.R2_ACCESS_KEY_ID,
-      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
-    },
+    accessKeyId: process.env.R2_ACCESS_KEY_ID as string,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY as string,
   });
 
-  const command = new PutObjectCommand({
-    Bucket: process.env.R2_BUCKET_NAME,
-    Key: uniqueFileName,
-    ContentType: fileType,
-  });
+  const url = new URL(
+    `https://${process.env.R2_BUCKET_NAME}.${
+      process.env.CLOUDFLARE_ACCOUNT_ID
+    }.r2.cloudflarestorage.com`
+  );
+  url.pathname = uniqueFileName;
+  url.searchParams.set("X-Amz-Expires", "3600");
 
   try {
-    const signedUrl = await getSignedUrl(s3Client, command, {
-      expiresIn: 3600,
-    });
-    event.node.res.setHeader(
-      "Access-Control-Allow-Origin",
-      "http://localhost:3000"
-    );
-    event.node.res.setHeader("Access-Control-Allow-Methods", "GET, PUT, POST");
-    event.node.res.setHeader("Access-Control-Allow-Headers", "*");
+    const signedUrl = await s3Client.sign(new Request(url, { method: "PUT" }), {
+      aws: {
+        signQuery: true
+      },
+    })
+
     return {
-      signedUrl,
+      signedUrl: signedUrl.url,
       fileName,
       uniqueFileName,
       fileType,

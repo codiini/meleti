@@ -1,4 +1,4 @@
-import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { AwsClient } from "aws4fetch";
 import { serverSupabaseClient } from "#supabase/server";
 
 export default defineEventHandler(async (event) => {
@@ -14,25 +14,23 @@ export default defineEventHandler(async (event) => {
 
   const fileId = getQuery(event).id as string;
 
-  const s3Client = new S3Client({
-    endpoint: process.env.R2_ENDPOINT,
+  const ENDPOINT =
+    `${process.env.R2_ENDPOINT}/${process.env.R2_BUCKET_NAME}/${fileId}` as string;
+
+  const s3Client = new AwsClient({
+    service: "s3",
     region: "auto",
-    signatureVersion: "v4",
-    credentials: {
-      accessKeyId: process.env.R2_ACCESS_KEY_ID,
-      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
-    },
+    accessKeyId: process.env.R2_ACCESS_KEY_ID as string,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY as string,
   });
 
-  const deleteObject = async (bucketName: string, objectKey: string) => {
-    const command = new DeleteObjectCommand({
-      Bucket: bucketName,
-      Key: objectKey,
-    });
-
+  const deleteObject = async () => {
     try {
-      await s3Client.send(command);
-      const { error, data } = await supabaseClient
+      await s3Client.fetch(ENDPOINT, {
+        method: "DELETE",
+      });
+
+      const { error } = await supabaseClient
         .from("course_files")
         .delete()
         .eq("unique_file_name", fileId)
@@ -46,7 +44,7 @@ export default defineEventHandler(async (event) => {
       }
       return {
         statusCode: 204,
-        body: data,
+        statusMessage: 'File Deleted Successfully'
       };
     } catch (error: any) {
       throw createError({
@@ -55,14 +53,5 @@ export default defineEventHandler(async (event) => {
       });
     }
   };
-
-  const response = await deleteObject(
-    process.env.R2_BUCKET_NAME as string,
-    fileId
-  );
-
-  return {
-    statusCode: 200,
-    body: response,
-  };
+  await deleteObject();
 });
