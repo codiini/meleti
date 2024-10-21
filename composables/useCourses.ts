@@ -13,12 +13,13 @@ export const useCourses = () => {
     fetch: false,
   });
 
-  const fetchCourses = async () => {
-    loadingStates.fetch = true;
+  const fetchCourses = async (state = false) => {
+    loadingStates.fetch = state;
     let { data, error } = await supabase
       .from("courses")
       .select("*")
-      .eq("user_id", user.value?.id);
+      .eq("user_id", user.value?.id)
+      .order("updated_at", { ascending: false });
     loadingStates.fetch = false;
     //set a deleting state on each course
     coursesList.value = data as Course[];
@@ -57,7 +58,6 @@ export const useCourses = () => {
         color: "red",
       });
     }
-    await fetchCourses();
     toast.add({
       title: "Course Deleted Successfully!",
       icon: "i-heroicons-check-badge-solid",
@@ -95,10 +95,15 @@ export const useCourses = () => {
     });
   };
 
-  const createCourse = async (title: string, description: string) => {
+  const createCourse = async (
+    title: string,
+    description: string
+  ): Promise<{
+    id: string;
+  } | null> => {
     loadingStates.save = true;
     const colorCode = generateUniqueColors(1000);
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("courses")
       .insert([
         {
@@ -118,12 +123,13 @@ export const useCourses = () => {
         icon: "i-heroicons-exclamation-circle",
         color: "red",
       });
-      return;
+      return null;
     }
     toast.add({
-      title: "Course Added Successfully!",
+      title: "Course Created Successfully!",
       icon: "i-heroicons-check-badge-solid",
     });
+    return data[0];
   };
 
   const getCourseFileDetails = async (id: string) => {
