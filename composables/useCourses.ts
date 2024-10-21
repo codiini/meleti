@@ -13,8 +13,8 @@ export const useCourses = () => {
     fetch: false,
   });
 
-  const fetchCourses = async () => {
-    loadingStates.fetch = true;
+  const fetchCourses = async (state = false) => {
+    loadingStates.fetch = state;
     let { data, error } = await supabase
       .from("courses")
       .select("*")

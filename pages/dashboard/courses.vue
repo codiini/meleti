@@ -388,6 +388,6 @@ watch(
 );
 
 onMounted(async () => {
-  await fetchCourses();
+  await fetchCourses(true);
 });
 </script>
