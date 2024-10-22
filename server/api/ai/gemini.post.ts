@@ -1,4 +1,4 @@
-import { VertexAI } from "@google-cloud/vertexai";
+import { SchemaType, VertexAI } from "@google-cloud/vertexai";
 import { MULTIPLE_CHOICE_PROMPT } from "~/utils/prompts";
 
 export default defineEventHandler(async (event) => {
@@ -17,7 +17,47 @@ export default defineEventHandler(async (event) => {
     },
   });
 
-  const model = "gemini-1.5-flash-001";
+  const model = "gemini-1.5-pro";
+
+  const schema = {
+    description: 'List of Questions',
+    type: SchemaType.ARRAY,
+    items: {
+      type: SchemaType.OBJECT,
+      properties: {
+        question: {
+          type: SchemaType.STRING,
+          description: 'The question text',
+        },
+        options: {
+          type: SchemaType.ARRAY,
+          items: {
+            type: SchemaType.OBJECT,
+            properties: {
+              label: {
+                type: SchemaType.STRING,
+                description: 'The display label for the option',
+              },
+              value: {
+                type: SchemaType.STRING,
+                description: 'The letter value associated with the option',
+              },
+            },
+            required: ['label', 'value'], // Specify required fields for options
+          },
+        },
+        explanation: {
+          type: SchemaType.STRING,
+          description: 'Explanation for the correct answer',
+        },
+        correctAnswer: {
+          type: SchemaType.STRING,
+          description: 'The correct answer to the question',
+        },
+      },
+      required: ['question', 'options', 'explanation', 'correctAnswer'], // Specify required fields for the question
+    },
+  }
 
   const generativeModel = vertex_ai.preview.getGenerativeModel({
     model: model,
@@ -30,6 +70,8 @@ export default defineEventHandler(async (event) => {
       ],
     },
     generationConfig: {
+      responseSchema: schema,
+      responseMimeType: "application/json",
       maxOutputTokens: 8192,
       temperature: 1,
       topP: 0.95,
@@ -49,8 +91,10 @@ export default defineEventHandler(async (event) => {
     const streamingResp = await generativeModel.generateContentStream(req);
     const aggregatedResponse = await streamingResp.response;
 
+    const formattedResponse = JSON.parse( aggregatedResponse?.candidates[0].content.parts[0].text);
+
     return {
-      aggregatedResponse,
+      aggregatedResponse: formattedResponse,
     };
   } catch (error) {
     console.error("Error generating content:", error);

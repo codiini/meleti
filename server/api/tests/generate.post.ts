@@ -2,11 +2,6 @@ import { randomUUID } from "crypto";
 import { serverSupabaseClient } from "#supabase/server";
 import { Question } from "~/types/questions";
 
-const cleanOutput = (output: string) => {
-  const cleanJsonString = output.replace(/^```json\n|\n```$/g, "").trim();
-  return JSON.parse(cleanJsonString);
-};
-
 export default defineEventHandler(async (event) => {
   const supabaseClient = await serverSupabaseClient(event);
   const body = await readBody(event);
@@ -47,15 +42,11 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    console.log("aggregatedResponse: ", aggregatedResponse);
 
-    const cleanedResponse = cleanOutput(
-      aggregatedResponse?.candidates[0].content.parts[0].text
-    );
-
-    cleanedResponse.forEach((question: Question) => {
-      question.id = randomUUID();
-    });
+    const questionsWithId = aggregatedResponse.map((question: Question) => ({
+      ...question,
+      id: randomUUID(),
+    }));
 
     const { data, error } = await supabaseClient
       .from("tests")
@@ -63,7 +54,7 @@ export default defineEventHandler(async (event) => {
         {
           course_id: courseId,
           title,
-          questions: cleanedResponse,
+          questions: questionsWithId,
           description,
           test_type: testType,
           duration,
